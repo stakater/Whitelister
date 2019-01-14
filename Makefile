@@ -1,20 +1,29 @@
-.PHONY: install test builder-image push lint fetch-dependencies binary-image
+# note: call scripts from /scripts
 
-DOCKER_IMAGE ?= stakater/whitelister
+.PHONY: default build builder-image binary-image test stop clean-images clean push apply deploy
 
+BUILDER ?= jamadar-builder
+BINARY ?= Jamadar
+DOCKER_IMAGE ?= stakater/jamadar
 # Default value "dev"
 DOCKER_TAG ?= dev
 REPOSITORY = ${DOCKER_IMAGE}:${DOCKER_TAG}
-BUILDER ?= whitelister-builder
-BINARY ?= whitelister
 
-install:  fetch-dependencies
+VERSION=$(shell cat .version)
+BUILD=
 
-fetch-dependencies:
-	dep ensure -v
+GOCMD = go
+GLIDECMD = glide
+GOFLAGS ?= $(GOFLAGS:)
+LDFLAGS =
 
-test:
-	go test -v ./...
+default: build test
+
+install:
+	"$(GLIDECMD)" install
+
+build:
+	"$(GOCMD)" build ${GOFLAGS} ${LDFLAGS} -o "${BINARY}"
 
 builder-image:
 	@docker build --network host -t "${BUILDER}" -f build/package/Dockerfile.build .
@@ -22,8 +31,22 @@ builder-image:
 binary-image: builder-image
 	@docker run --network host --rm "${BUILDER}" | docker build --network host -t "${REPOSITORY}" -f Dockerfile.run -
 
-lint:
-	golangci-lint run --enable-all --skip-dirs vendor
+test:
+	"$(GOCMD)" test -v ./...
 
-push:
-	docker push ${DOCKER_IMAGE}:${DOCKER_TAG}
+stop:
+	@docker stop "${BINARY}"
+
+clean-images: stop
+	@docker rmi "${BUILDER}" "${BINARY}"
+
+clean:
+	"$(GOCMD)" clean -i
+
+push: ## push the latest Docker image to DockerHub
+	docker push $(REPOSITORY)
+
+apply:
+	kubectl apply -f deployments/manifests/
+
+deploy: binary-image push apply
