@@ -1,0 +1,17 @@
+syncInterval: 10s
+removeUnknownIp: true
+filter:
+  labelName: app
+  labelValue: internal-ingress
+ipProviders:
+  - name: kubernetes
+    params:
+      FromPort: 0 
+      ToPort: 65535
+      IpProtocol: tcp
+provider:
+  name: aws
+  params:
+    RoleArn: <aws-iam-role-arn>
+    Region: <aws-region>
+ 
