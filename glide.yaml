@@ -4,6 +4,10 @@ import:
   version: 1.0.5
 - package: k8s.io/api
   version: kubernetes-1.8.0
+- package: k8s.io/apimachinery
+  version: kubernetes-1.8.0
+- package: k8s.io/client-go
+  version: 5.0.0
 - package: gopkg.in/yaml.v2
   version: v2.2.1
 - package: github.com/spf13/cobra
