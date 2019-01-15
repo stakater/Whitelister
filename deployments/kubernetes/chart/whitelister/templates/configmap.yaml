@@ -23,6 +23,6 @@ data:
     provider:
         name: {{ .Values.whitelister.provider.name }}
         params:
-        {{- range $key, $value := .params }}
+        {{- range $key, $value := .Values.whitelister.provider.params }}
           {{ $key }}: {{ $value }}
         {{- end }}

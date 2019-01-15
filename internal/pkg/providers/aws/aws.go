@@ -40,7 +40,7 @@ func (a *Aws) Init(params map[interface{}]interface{}) error {
 	return nil
 }
 
-// Get List of IP addresses to whitelist
+// WhiteListIps - Get List of IP addresses to whitelist
 func (a *Aws) WhiteListIps(resourceIds []string, ipPermissions []utils.IpPermission) error {
 
 	// Initial credentials loaded from SDK's default credential chain. Such as
@@ -56,20 +56,23 @@ func (a *Aws) WhiteListIps(resourceIds []string, ipPermissions []utils.IpPermiss
 	// referenced by the "myRoleARN" ARN.
 	roleCredentials := stscreds.NewCredentials(session, a.RoleArn)
 
-	securityGroups, err := getSecurityGroups(session, roleCredentials, resourceIds)
+	securityGroups, err := a.getSecurityGroups(session, roleCredentials, resourceIds)
 	if err != nil {
 		logrus.Errorf("%v", err)
 		return err
 	}
 
 	if len(securityGroups) != 1 {
-		logrus.Errorf("FIX ME")
+		logrus.Errorf("FIX ME : %v", securityGroups)
 		return nil
 	}
 
 	ec2IpPermissions := getEc2IpPermissions(ipPermissions)
 
-	ec2Client := ec2.New(session, &aws.Config{Credentials: roleCredentials})
+	ec2Client := ec2.New(session, &aws.Config{
+		Credentials: roleCredentials,
+		Region:      aws.String(a.Region),
+	})
 
 	for _, securityGroup := range securityGroups {
 		updateSecurityGroup(ec2Client, securityGroup, ec2IpPermissions)
@@ -77,11 +80,14 @@ func (a *Aws) WhiteListIps(resourceIds []string, ipPermissions []utils.IpPermiss
 	return nil
 }
 
-func getSecurityGroups(session *session.Session, credentials *credentials.Credentials,
+func (a *Aws) getSecurityGroups(session *session.Session, credentials *credentials.Credentials,
 	resourceIds []string) ([]*ec2.SecurityGroup, error) {
 
 	// Create an ELB service client.
-	elbClient := elb.New(session, &aws.Config{Credentials: credentials})
+	elbClient := elb.New(session, &aws.Config{
+		Credentials: credentials,
+		Region:      aws.String(a.Region),
+	})
 
 	result, err := elbClient.DescribeLoadBalancers(&elb.DescribeLoadBalancersInput{
 		LoadBalancerNames: aws.StringSlice(resourceIds),
@@ -100,7 +106,10 @@ func getSecurityGroups(session *session.Session, credentials *credentials.Creden
 		securityGroupNames = append(securityGroupNames, loadBalancerDescription.SourceSecurityGroup.GroupName)
 	}
 
-	ec2Client := ec2.New(session)
+	ec2Client := ec2.New(session, &aws.Config{
+		Credentials: credentials,
+		Region:      aws.String(a.Region),
+	})
 
 	securityGroupResult, err := ec2Client.DescribeSecurityGroups(&ec2.DescribeSecurityGroupsInput{
 		Filters: []*ec2.Filter{
@@ -110,10 +119,15 @@ func getSecurityGroups(session *session.Session, credentials *credentials.Creden
 			},
 			{
 				Name:   &groupFilter,
-				Values: aws.StringSlice(resourceIds),
+				Values: securityGroupNames,
 			},
 		},
 	})
+
+	if err != nil {
+		logrus.Errorf("%v", err)
+		return nil, err
+	}
 
 	return securityGroupResult.SecurityGroups, nil
 }

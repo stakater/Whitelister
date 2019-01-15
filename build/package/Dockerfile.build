@@ -11,7 +11,7 @@ RUN apk -v --update \
 ADD . "$GOPATH/src/github.com/stakater/Whitelister"
 
 RUN cd "$GOPATH/src/github.com/stakater/Whitelister" && \
-    glide update && \
+    glide update --strip-vendor && \
     CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a --installsuffix cgo --ldflags="-s" -o /Whitelister
 
 COPY build/package/Dockerfile.run /
