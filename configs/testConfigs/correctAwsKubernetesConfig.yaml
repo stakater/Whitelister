@@ -12,6 +12,6 @@ ipProviders:
 provider:
   name: aws
   params:
-    RoleArn: <aws-iam-role-arn>
-    Region: <aws-region>
+    RoleArn: "arn:aws:iam::111111111111:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+    Region: us-west-2
  
