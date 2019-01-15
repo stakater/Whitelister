@@ -12,7 +12,7 @@ import (
 	"github.com/stakater/Whitelister/pkg/kube"
 )
 
-// Task represents the actual tasks and actions to be taken by Jamadar
+// Task represents the actual tasks and actions to be taken by Whitelister
 type Task struct {
 	clientset   clientset.Interface
 	ipProviders []ipProviders.IpProvider

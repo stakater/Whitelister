@@ -13,7 +13,7 @@ import (
 	clientset "k8s.io/client-go/kubernetes"
 )
 
-// Controller Jamadar Controller to check for left over items
+// Controller Whitelister Controller to check for left over items
 type Controller struct {
 	clientset   clientset.Interface
 	config      config.Config

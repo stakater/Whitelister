@@ -2,9 +2,9 @@
 
 .PHONY: default build builder-image binary-image test stop clean-images clean push apply deploy
 
-BUILDER ?= jamadar-builder
-BINARY ?= Jamadar
-DOCKER_IMAGE ?= stakater/jamadar
+BUILDER ?= whitelister-builder
+BINARY ?= Whitelister
+DOCKER_IMAGE ?= stakater/whitelister
 # Default value "dev"
 DOCKER_TAG ?= dev
 REPOSITORY = ${DOCKER_IMAGE}:${DOCKER_TAG}
