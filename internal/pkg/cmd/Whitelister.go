@@ -28,6 +28,8 @@ func startWhitelister(cmd *cobra.Command, args []string) {
 	}
 	if clientset != nil {
 		logrus.Infof("GOT CLIENT SET")
+	} else {
+		logrus.Panicf("Kube Client set not found.")
 	}
 
 	// get the Controller config file

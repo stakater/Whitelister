@@ -11,7 +11,7 @@ import (
 // IpProvider interface so that other IpProvider like github can implement this
 type IpProvider interface {
 	Init(map[interface{}]interface{}) error
-	GetIpPermissions() ([]utils.IpPermission, error)
+	GetIPPermissions() ([]utils.IpPermission, error)
 	GetName() string
 }
 

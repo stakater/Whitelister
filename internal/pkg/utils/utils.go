@@ -22,9 +22,10 @@ func GetLoadBalancerNameFromDNSName(dnsName string) string {
 //IsEc2IpPermissionEqual Compares two ec2 ips to check if they are equal
 func IsEc2IpPermissionEqual(ipPermission1 *ec2.IpPermission, ipPermission2 *ec2.IpPermission) bool {
 
-	if *ipPermission1.FromPort == *ipPermission2.FromPort &&
-		*ipPermission1.IpProtocol == *ipPermission2.IpProtocol &&
-		*ipPermission1.ToPort == *ipPermission2.ToPort &&
+	//TODO: Check if these checks can be achieved with reflection
+	if IsInt64Equal(ipPermission1.FromPort, ipPermission2.FromPort) &&
+		IsInt64Equal(ipPermission1.ToPort, ipPermission2.ToPort) &&
+		IsStringEqual(ipPermission1.IpProtocol, ipPermission2.IpProtocol) &&
 		IsEc2IpRangeEqual(ipPermission1.IpRanges, ipPermission2.IpRanges) &&
 		IsEc2Ipv6RangeEqual(ipPermission1.Ipv6Ranges, ipPermission2.Ipv6Ranges) {
 
@@ -84,6 +85,17 @@ func IsEc2Ipv6RangeEqual(ipv6Ranges1 []*ec2.Ipv6Range, ipv6Ranges2 []*ec2.Ipv6Ra
 
 // IsStringEqual Compares two String pointers with checks for null pointers
 func IsStringEqual(val1 *string, val2 *string) bool {
+	if val1 == nil && val2 != nil {
+		return false
+	} else if val1 != nil && val2 == nil {
+		return false
+	} else {
+		return *val1 == *val2
+	}
+}
+
+// IsInt64Equal Compares two int64 pointers with checks for null pointers
+func IsInt64Equal(val1 *int64, val2 *int64) bool {
 	if val1 == nil && val2 != nil {
 		return false
 	} else if val1 != nil && val2 == nil {

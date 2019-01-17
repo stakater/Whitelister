@@ -9,7 +9,6 @@ import (
 	"github.com/stakater/Whitelister/internal/pkg/ipProviders"
 	"github.com/stakater/Whitelister/internal/pkg/providers"
 	"github.com/stakater/Whitelister/internal/pkg/utils"
-	"github.com/stakater/Whitelister/pkg/kube"
 )
 
 // Task represents the actual tasks and actions to be taken by Whitelister
@@ -35,14 +34,14 @@ func NewTask(clientSet clientset.Interface, ipProviders []ipProviders.IpProvider
 func (t *Task) PerformTasks() {
 	combinedIpPermissions := []utils.IpPermission{}
 	for _, ipProvider := range t.ipProviders {
-		ipList, err := ipProvider.GetIpPermissions()
+		ipList, err := ipProvider.GetIPPermissions()
 		if err != nil {
-			logrus.Errorf("Error getting Ip list from provider: %s", ipProvider.GetName())
+			logrus.Errorf("Error getting Ip list from provider: %s\n err: %v", ipProvider.GetName(), err)
 		}
 		combinedIpPermissions = append(combinedIpPermissions, ipList...)
 	}
 
-	loadBalancerNames := getLoadBalancerNames(t.config.Filter)
+	loadBalancerNames := t.getLoadBalancerNames(t.config.Filter)
 
 	if len(loadBalancerNames) > 0 {
 		t.provider.WhiteListIps(loadBalancerNames, combinedIpPermissions)
@@ -55,13 +54,8 @@ func (t *Task) PerformTasks() {
 }
 
 // Get Load Balancer names
-func getLoadBalancerNames(filter config.Filter) []string {
-	clientset, err := kube.GetClient()
-	if err != nil {
-		logrus.Fatal(err)
-	}
-
-	services, err := clientset.Core().Services("").List(meta_v1.ListOptions{
+func (t *Task) getLoadBalancerNames(filter config.Filter) []string {
+	services, err := t.clientset.Core().Services("").List(meta_v1.ListOptions{
 		LabelSelector: filter.LabelName + "=" + filter.LabelValue},
 	)
 
