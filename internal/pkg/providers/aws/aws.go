@@ -2,6 +2,7 @@ package aws
 
 import (
 	"errors"
+	"regexp"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -17,13 +18,16 @@ import (
 
 // Aws provider class implementing the Provider interface
 type Aws struct {
-	RoleArn string
-	Region  string
+	RoleArn                   string
+	Region                    string
+	RemoveRule                bool
+	KeepRuleDescriptionPrefix string
 }
 
-var vpcFilter string = "vpc-id"
-var groupFilter string = "group-name"
+var vpcFilter = "vpc-id"
+var groupFilter = "group-name"
 
+// GetName Returns name of provider
 func (a *Aws) GetName() string {
 	return "Amazon Web Services"
 }
@@ -75,7 +79,7 @@ func (a *Aws) WhiteListIps(resourceIds []string, ipPermissions []utils.IpPermiss
 	})
 
 	for _, securityGroup := range securityGroups {
-		updateSecurityGroup(ec2Client, securityGroup, ec2IpPermissions)
+		a.updateSecurityGroup(ec2Client, securityGroup, ec2IpPermissions)
 	}
 	return nil
 }
@@ -132,16 +136,18 @@ func (a *Aws) getSecurityGroups(session *session.Session, credentials *credentia
 	return securityGroupResult.SecurityGroups, nil
 }
 
-func updateSecurityGroup(client *ec2.EC2, securityGroup *ec2.SecurityGroup,
+func (a *Aws) updateSecurityGroup(client *ec2.EC2, securityGroup *ec2.SecurityGroup,
 	ipPermissions []*ec2.IpPermission) error {
 
-	removeSecurityRules(client, securityGroup, ipPermissions)
+	if a.RemoveRule {
+		a.removeSecurityRules(client, securityGroup, ipPermissions)
+	}
 	addSecurityRules(client, securityGroup, ipPermissions)
 
 	return nil
 }
 
-func removeSecurityRules(client *ec2.EC2, securityGroup *ec2.SecurityGroup,
+func (a *Aws) removeSecurityRules(client *ec2.EC2, securityGroup *ec2.SecurityGroup,
 	ipPermissions []*ec2.IpPermission) {
 	var removeIpPermission bool
 	ipPermissionsToRemove := []*ec2.IpPermission{}
@@ -159,6 +165,8 @@ func removeSecurityRules(client *ec2.EC2, securityGroup *ec2.SecurityGroup,
 		}
 	}
 	if len(ipPermissionsToRemove) > 0 {
+		ipPermissionsToRemove := a.filterIpPermissions(ipPermissionsToRemove)
+
 		logrus.Infof("Removing security rules : %v for security group :%s", ipPermissionsToRemove, *securityGroup.GroupName)
 		err := removeSecurityGroupIngresses(client, securityGroup, ipPermissionsToRemove)
 		if err != nil {
@@ -167,6 +175,47 @@ func removeSecurityRules(client *ec2.EC2, securityGroup *ec2.SecurityGroup,
 	} else {
 		logrus.Infof("No security rules to remove for security group : %s", *securityGroup.GroupName)
 	}
+}
+
+func (a *Aws) filterIpPermissions(ipPermissions []*ec2.IpPermission) []*ec2.IpPermission {
+
+	filteredIpPermissions := []*ec2.IpPermission{}
+
+	for _, ipPermission := range ipPermissions {
+		ipPermission.IpRanges = a.filterIpRanges(ipPermission.IpRanges)
+		ipPermission.Ipv6Ranges = a.filterIpv6Ranges(ipPermission.Ipv6Ranges)
+		filteredIpPermissions = append(filteredIpPermissions, ipPermission)
+	}
+
+	return filteredIpPermissions
+}
+
+func (a *Aws) filterIpRanges(ipRanges []*ec2.IpRange) []*ec2.IpRange {
+
+	reg, _ := regexp.Compile(a.KeepRuleDescriptionPrefix + ".*$")
+	filteredIpRanges := []*ec2.IpRange{}
+
+	for _, ipRange := range ipRanges {
+		if !reg.MatchString(*ipRange.Description) {
+			filteredIpRanges = append(filteredIpRanges, ipRange)
+		}
+	}
+
+	return filteredIpRanges
+}
+
+func (a *Aws) filterIpv6Ranges(ipv6Ranges []*ec2.Ipv6Range) []*ec2.Ipv6Range {
+
+	reg, _ := regexp.Compile(a.KeepRuleDescriptionPrefix + ".*$")
+	filteredIpv6Ranges := []*ec2.Ipv6Range{}
+
+	for _, ipv6Range := range ipv6Ranges {
+		if !reg.MatchString(*ipv6Range.Description) {
+			filteredIpv6Ranges = append(filteredIpv6Ranges, ipv6Range)
+		}
+	}
+
+	return filteredIpv6Ranges
 }
 
 func addSecurityRules(client *ec2.EC2, securityGroup *ec2.SecurityGroup,

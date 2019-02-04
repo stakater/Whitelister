@@ -13,7 +13,6 @@ whitelister:
     tag: "{{ getenv "VERSION" }}"
     pullPolicy: IfNotPresent
   syncInterval: 10s
-  removeUnknownIp: true
   filter:
     labelName: whitelister
     labelValue: true
@@ -26,6 +25,8 @@ whitelister:
   provider:
     name: aws
     params:
+      KeepRuleDescriptionPrefix: "DO NOT REMOVE -"
+      RemoveRule: true
       RoleArn: <aws-iam-role-arn>
-      region: <aws-region>
+      Region: <aws-region>
   configFilePath: /configs/config.yaml

@@ -8,7 +8,6 @@ metadata:
 data:
   config.yaml: |-
     syncInterval: {{ .Values.whitelister.syncInterval }}
-    removeUnknownIp: {{ .Values.whitelister.removeUnknownIp }}
     filter:
         labelName: {{ .Values.whitelister.filter.labelName }}
         labelValue: {{ .Values.whitelister.filter.labelValue }}

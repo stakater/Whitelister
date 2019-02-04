@@ -11,7 +11,6 @@ import (
 // Config which would be read from the config.yaml
 type Config struct {
 	SyncInterval    string       `yaml:"syncInterval"`
-	RemoveUnknownIp bool         `yaml:"removeUnknownIp"`
 	IpProviders     []IpProvider `yaml:"ipProviders"`
 	Provider        Provider     `yaml:"provider"`
 	Filter          Filter       `yaml:"filter"`

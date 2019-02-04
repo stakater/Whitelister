@@ -1,5 +1,4 @@
 syncInterval: 10s
-removeUnknownIp: true
 filter:
   labelName: whitelister
   labelValue: true
@@ -12,6 +11,8 @@ ipProviders:
 provider:
   name: aws
   params:
+    KeepRuleDescriptionPrefix: "DO NOT REMOVE -"
+    RemoveRule: true
     RoleArn: <aws-iam-role-arn>
     Region: <aws-region>
  

@@ -23,8 +23,7 @@ func TestReadConfig(t *testing.T) {
 			name: "TestingWithCorrectValues",
 			args: args{filePath: configFilePath + "correctAwsKubernetesConfig.yaml"},
 			want: Config{
-				SyncInterval:    "10s",
-				RemoveUnknownIp: true,
+				SyncInterval: "10s",
 				IpProviders: []IpProvider{
 					IpProvider{
 						Name: "kubernetes",
@@ -38,8 +37,10 @@ func TestReadConfig(t *testing.T) {
 				Provider: Provider{
 					Name: "aws",
 					Params: map[interface{}]interface{}{
-						"RoleArn": "arn:aws:iam::111111111111:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
-						"Region":  "us-west-2",
+						"RoleArn":                   "arn:aws:iam::111111111111:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+						"Region":                    "us-west-2",
+						"RemoveRule":                true,
+						"KeepRuleDescriptionPrefix": "DO NOT REMOVE -",
 					},
 				},
 				Filter: Filter{
