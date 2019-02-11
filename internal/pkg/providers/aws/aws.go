@@ -196,7 +196,7 @@ func (a *Aws) filterIpRanges(ipRanges []*ec2.IpRange) []*ec2.IpRange {
 	filteredIpRanges := []*ec2.IpRange{}
 
 	for _, ipRange := range ipRanges {
-		if !reg.MatchString(*ipRange.Description) {
+		if ipRange.Description == nil || !reg.MatchString(*ipRange.Description) {
 			filteredIpRanges = append(filteredIpRanges, ipRange)
 		}
 	}
@@ -210,7 +210,7 @@ func (a *Aws) filterIpv6Ranges(ipv6Ranges []*ec2.Ipv6Range) []*ec2.Ipv6Range {
 	filteredIpv6Ranges := []*ec2.Ipv6Range{}
 
 	for _, ipv6Range := range ipv6Ranges {
-		if !reg.MatchString(*ipv6Range.Description) {
+		if ipv6Range.Description == nil || !reg.MatchString(*ipv6Range.Description) {
 			filteredIpv6Ranges = append(filteredIpv6Ranges, ipv6Range)
 		}
 	}
