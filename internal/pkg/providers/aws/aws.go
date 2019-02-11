@@ -250,10 +250,10 @@ func addSecurityRules(client *ec2.EC2, securityGroup *ec2.SecurityGroup,
 func removeSecurityGroupIngresses(client *ec2.EC2, securityGroup *ec2.SecurityGroup,
 	ipPermissions []*ec2.IpPermission) error {
 
-	// _, err := client.RevokeSecurityGroupIngress(&ec2.RevokeSecurityGroupIngressInput{
-	// 	GroupId:       securityGroup.GroupId,
-	// 	IpPermissions: ipPermissions,
-	// })
+	_, err := client.RevokeSecurityGroupIngress(&ec2.RevokeSecurityGroupIngressInput{
+		GroupId:       securityGroup.GroupId,
+		IpPermissions: ipPermissions,
+	})
 
 	return nil
 }
@@ -261,10 +261,10 @@ func removeSecurityGroupIngresses(client *ec2.EC2, securityGroup *ec2.SecurityGr
 func addSecurityGroupIngresses(client *ec2.EC2, securityGroup *ec2.SecurityGroup,
 	ipPermissions []*ec2.IpPermission) error {
 
-	// _, err := client.AuthorizeSecurityGroupIngress(&ec2.AuthorizeSecurityGroupIngressInput{
-	// 	GroupId:       securityGroup.GroupId,
-	// 	IpPermissions: ipPermissions,
-	// })
+	_, err := client.AuthorizeSecurityGroupIngress(&ec2.AuthorizeSecurityGroupIngressInput{
+		GroupId:       securityGroup.GroupId,
+		IpPermissions: ipPermissions,
+	})
 
 	return nil
 }
