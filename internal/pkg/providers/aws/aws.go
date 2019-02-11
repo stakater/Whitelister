@@ -255,7 +255,7 @@ func removeSecurityGroupIngresses(client *ec2.EC2, securityGroup *ec2.SecurityGr
 		IpPermissions: ipPermissions,
 	})
 
-	return nil
+	return err
 }
 
 func addSecurityGroupIngresses(client *ec2.EC2, securityGroup *ec2.SecurityGroup,
@@ -266,7 +266,7 @@ func addSecurityGroupIngresses(client *ec2.EC2, securityGroup *ec2.SecurityGroup
 		IpPermissions: ipPermissions,
 	})
 
-	return nil
+	return err
 }
 
 func getEc2IpPermissions(ipPermissions []utils.IpPermission) []*ec2.IpPermission {
