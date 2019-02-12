@@ -1,0 +1,10 @@
+syncInterval: 10s
+filter:
+  labelName: whitelister
+  labelValue: true
+ipProviders:
+  - name: kubernetes
+    params:
+      FromPort: 0 
+      ToPort: 65535
+      IpProtocol: tcp

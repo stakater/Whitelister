@@ -9,8 +9,8 @@ data:
   config.yaml: |-
     syncInterval: {{ .Values.whitelister.syncInterval }}
     filter:
-        labelName: {{ .Values.whitelister.filter.labelName }}
-        labelValue: {{ .Values.whitelister.filter.labelValue }}
+      labelName: {{ .Values.whitelister.filter.labelName }}
+      labelValue: {{ .Values.whitelister.filter.labelValue }}
     ipProviders:
     {{- range .Values.whitelister.ipProviders }}
     - name: {{ .name }}
