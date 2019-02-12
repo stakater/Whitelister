@@ -7,10 +7,10 @@ import (
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
 
+	test_utils "github.com/stakater/Whitelister/internal/pkg/test/utils"
 	"github.com/stakater/Whitelister/internal/pkg/utils"
 )
 
@@ -116,22 +116,28 @@ func TestGetNodesIPPermissions(t *testing.T) {
 	kube.Init(map[interface{}]interface{}{"FromPort": int64(0), "ToPort": int64(65535), "IpProtocol": "tcp"})
 
 	nodesList := []runtime.Object{}
-	ipPermissions := []utils.IpPermission{}
+	ipRanges := []*utils.IpRange{}
 
 	for i := 1; i < 3; i++ {
 		ipCidr := fmt.Sprintf("127.0.0.%d/32", i)
 		ipAddr := fmt.Sprintf("127.0.0.%d", i)
 		name := fmt.Sprintf("node-%d", i)
 
-		nodesList = append(nodesList, node(name, ipAddr))
+		nodesList = append(nodesList, test_utils.Node(name, ipAddr))
 
-		ipPermissions = append(ipPermissions, utils.IpPermission{
-			FromPort:    kube.FromPort,
-			ToPort:      kube.ToPort,
-			IpProtocol:  kube.IpProtocol,
+		ipRanges = append(ipRanges, &utils.IpRange{
 			IpCidr:      &ipCidr,
 			Description: &name,
 		})
+	}
+
+	ipPermissions := []utils.IpPermission{
+		{
+			FromPort:   kube.FromPort,
+			ToPort:     kube.ToPort,
+			IpProtocol: kube.IpProtocol,
+			IpRanges:   ipRanges,
+		},
 	}
 
 	tests := []struct {
@@ -142,9 +148,15 @@ func TestGetNodesIPPermissions(t *testing.T) {
 		errValue error
 	}{
 		{
-			name:     "get 0 nodes IP",
-			args:     []runtime.Object{},
-			want:     []utils.IpPermission{},
+			name: "get 0 nodes IP",
+			args: []runtime.Object{},
+			want: []utils.IpPermission{
+				{
+					FromPort:   kube.FromPort,
+					ToPort:     kube.ToPort,
+					IpProtocol: kube.IpProtocol,
+				},
+			},
 			wantErr:  false,
 			errValue: nil,
 		},
@@ -170,8 +182,17 @@ func TestGetNodesIPPermissions(t *testing.T) {
 				}
 			}
 
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Got: %v, Wanted: %v", got, tt.want)
+			for _, gotPermission := range got {
+				contains := false
+				for _, wantPermission := range tt.want {
+					if gotPermission.Equal(&wantPermission) {
+						contains = true
+					}
+				}
+				if !contains {
+					t.Errorf("Got: %v, Wanted: %v", got, tt.want)
+					return
+				}
 			}
 		})
 	}
@@ -188,23 +209,20 @@ func TestGetNodeIPPermissions(t *testing.T) {
 	tests := []struct {
 		name     string
 		args     corev1.Node
-		want     *utils.IpPermission
+		want     *utils.IpRange
 		wantErr  bool
 		errValue error
 	}{
 		{
 			name:     "Node without External IP",
-			args:     *node("node", ""),
+			args:     *test_utils.Node(name, ""),
 			wantErr:  true,
-			errValue: fmt.Errorf("No ExternalIP for Node: node"),
+			errValue: fmt.Errorf("No ExternalIP for Node: %s", name),
 		},
 		{
 			name: "Node with External IP",
-			args: *node(name, ipAddr),
-			want: &utils.IpPermission{
-				FromPort:    kube.FromPort,
-				ToPort:      kube.ToPort,
-				IpProtocol:  kube.IpProtocol,
+			args: *test_utils.Node(name, ipAddr),
+			want: &utils.IpRange{
 				IpCidr:      &ipCidr,
 				Description: &name,
 			},
@@ -215,7 +233,7 @@ func TestGetNodeIPPermissions(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			got, err := kube.getNodeIPPermissions(tt.args)
+			got, err := kube.getNodeIPRange(tt.args)
 
 			if err != nil && tt.wantErr {
 				if err.Error() != tt.errValue.Error() {
@@ -234,17 +252,4 @@ func TestGetNodeIPPermissions(t *testing.T) {
 		})
 	}
 
-}
-
-func node(name string, ipAddress string) *corev1.Node {
-	addresses := []corev1.NodeAddress{}
-
-	if ipAddress != "" {
-		addresses = append(addresses, corev1.NodeAddress{Type: corev1.NodeExternalIP, Address: ipAddress})
-	}
-
-	return &corev1.Node{
-		ObjectMeta: metav1.ObjectMeta{Name: name},
-		Status:     corev1.NodeStatus{Addresses: addresses},
-	}
 }

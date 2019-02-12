@@ -201,6 +201,10 @@ func (a *Aws) filterIpRanges(ipRanges []*ec2.IpRange) []*ec2.IpRange {
 		}
 	}
 
+	if len(filteredIpRanges) == 0 {
+		return nil
+	}
+
 	return filteredIpRanges
 }
 
@@ -213,6 +217,10 @@ func (a *Aws) filterIpv6Ranges(ipv6Ranges []*ec2.Ipv6Range) []*ec2.Ipv6Range {
 		if ipv6Range.Description == nil || !reg.MatchString(*ipv6Range.Description) {
 			filteredIpv6Ranges = append(filteredIpv6Ranges, ipv6Range)
 		}
+	}
+
+	if len(filteredIpv6Ranges) == 0 {
+		return nil
 	}
 
 	return filteredIpv6Ranges
@@ -278,14 +286,26 @@ func getEc2IpPermissions(ipPermissions []utils.IpPermission) []*ec2.IpPermission
 				SetIpProtocol(*ipPermission.IpProtocol).
 				SetFromPort(*ipPermission.FromPort).
 				SetToPort(*ipPermission.ToPort).
-				SetIpRanges([]*ec2.IpRange{
-					{
-						CidrIp:      ipPermission.IpCidr,
-						Description: ipPermission.Description,
-					},
-				}),
+				SetIpRanges(getEc2IpRanges(ipPermission.IpRanges)),
 		)
 	}
 
 	return ec2IpPermissions
+}
+
+func getEc2IpRanges(ipRanges []*utils.IpRange) []*ec2.IpRange {
+
+	if ipRanges == nil {
+		return nil
+	}
+
+	ec2IpRanges := []*ec2.IpRange{}
+
+	for _, ipRange := range ipRanges {
+		ec2IpRanges = append(ec2IpRanges, &ec2.IpRange{
+			CidrIp:      ipRange.IpCidr,
+			Description: ipRange.Description,
+		})
+	}
+	return ec2IpRanges
 }

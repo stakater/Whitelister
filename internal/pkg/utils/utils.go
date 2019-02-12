@@ -7,11 +7,43 @@ import (
 )
 
 type IpPermission struct {
+	IpRanges   []*IpRange
+	FromPort   *int64
+	ToPort     *int64
+	IpProtocol *string
+}
+
+func (ipPermission1 *IpPermission) Equal(ipPermission2 *IpPermission) bool {
+	if *ipPermission1.FromPort != *ipPermission2.FromPort ||
+		*ipPermission1.ToPort != *ipPermission2.ToPort ||
+		*ipPermission1.IpProtocol != *ipPermission2.IpProtocol ||
+		len(ipPermission1.IpRanges) != len(ipPermission2.IpRanges) {
+		return false
+	}
+
+	for _, ipRange1 := range ipPermission1.IpRanges {
+		contains := false
+		for _, ipRange2 := range ipPermission2.IpRanges {
+			if ipRange1.Equal(ipRange2) {
+				contains = true
+				break
+			}
+		}
+		if !contains {
+			return false
+		}
+	}
+
+	return true
+}
+
+type IpRange struct {
 	IpCidr      *string
 	Description *string
-	FromPort    *int64
-	ToPort      *int64
-	IpProtocol  *string
+}
+
+func (ipRange1 *IpRange) Equal(ipRange2 *IpRange) bool {
+	return *ipRange1.IpCidr == *ipRange2.IpCidr && *ipRange1.Description == *ipRange2.Description
 }
 
 //GetLoadBalancerNameFromDNSName gets the name of load balancer from DNS name by splitting the dnsName on '-'

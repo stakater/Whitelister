@@ -61,28 +61,35 @@ func (k *Kube) getNodesIPPermissions(client v1.CoreV1Interface) ([]utils.IpPermi
 		return nil, err
 	}
 
-	ipPermissions := []utils.IpPermission{}
+	ipRanges := []*utils.IpRange{}
+
 	for _, node := range nodes.Items {
-		ipPermission, err := k.getNodeIPPermissions(node)
+		ipRange, err := k.getNodeIPRange(node)
 		if err != nil {
 			logrus.Error(err)
 		} else {
-			ipPermissions = append(ipPermissions, *ipPermission)
+			ipRanges = append(ipRanges, ipRange)
 		}
+	}
+
+	ipPermissions := []utils.IpPermission{
+		{
+			FromPort:   k.FromPort,
+			ToPort:     k.ToPort,
+			IpProtocol: k.IpProtocol,
+			IpRanges:   ipRanges,
+		},
 	}
 	return ipPermissions, nil
 }
 
 // getNodeIPPermissions - Get IP permission based on ExternalIP of node
-func (k *Kube) getNodeIPPermissions(node corev1.Node) (*utils.IpPermission, error) {
+func (k *Kube) getNodeIPRange(node corev1.Node) (*utils.IpRange, error) {
 	for _, address := range node.Status.Addresses {
 		if address.Type == "ExternalIP" {
 			ipCidr := address.Address + "/32"
-			return &utils.IpPermission{
+			return &utils.IpRange{
 				IpCidr:      &(ipCidr),
-				FromPort:    k.FromPort,
-				ToPort:      k.ToPort,
-				IpProtocol:  k.IpProtocol,
 				Description: (&(node.Name)),
 			}, nil
 		}

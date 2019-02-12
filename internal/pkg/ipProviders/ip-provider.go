@@ -17,7 +17,7 @@ type IpProvider interface {
 
 // PopulateFromConfig populates the IpProvider from config
 func PopulateFromConfig(configIpProviders []config.IpProvider) []IpProvider {
-	var populatedIpProviders []IpProvider
+	populatedIpProviders := []IpProvider{}
 	for _, configIpProvider := range configIpProviders {
 		ipProviderToAdd := MapToIpProvider(configIpProvider.Name)
 		if ipProviderToAdd != nil {
@@ -34,12 +34,12 @@ func PopulateFromConfig(configIpProviders []config.IpProvider) []IpProvider {
 
 // MapToIpProvider maps the IP provider name to the actual IpProvider type
 func MapToIpProvider(ipProviderName string) IpProvider {
-	ipProvider, ok := ipProviderMap[ipProviderName]
-	if !ok {
-		logrus.Errorf("Cannot find an ip provider for : %s", ipProviderName)
-		return nil
+	switch ipProviderName {
+	case "kubernetes":
+		return &kube.Kube{}
 	}
-	return ipProvider
+	logrus.Errorf("Cannot find an ip provider for : %s", ipProviderName)
+	return nil
 }
 
 var ipProviderMap = map[string]IpProvider{
