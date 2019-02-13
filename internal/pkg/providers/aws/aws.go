@@ -152,7 +152,9 @@ func (a *Aws) removeSecurityRules(client *ec2.EC2, securityGroup *ec2.SecurityGr
 	var removeIpPermission bool
 	ipPermissionsToRemove := []*ec2.IpPermission{}
 
-	for _, securityGroupIpPermission := range securityGroup.IpPermissions {
+	securityGroupFilteredIpPermissions := a.filterIpPermissions(securityGroup.IpPermissions)
+
+	for _, securityGroupIpPermission := range securityGroupFilteredIpPermissions {
 		removeIpPermission = true
 		for _, ipPermission := range ipPermissions {
 			if utils.IsEc2IpPermissionEqual(ipPermission, securityGroupIpPermission) {
@@ -164,9 +166,8 @@ func (a *Aws) removeSecurityRules(client *ec2.EC2, securityGroup *ec2.SecurityGr
 			ipPermissionsToRemove = append(ipPermissionsToRemove, securityGroupIpPermission)
 		}
 	}
-	if len(ipPermissionsToRemove) > 0 {
-		ipPermissionsToRemove := a.filterIpPermissions(ipPermissionsToRemove)
 
+	if len(ipPermissionsToRemove) > 0 {
 		logrus.Infof("Removing security rules : %v for security group :%s", ipPermissionsToRemove, *securityGroup.GroupName)
 		err := removeSecurityGroupIngresses(client, securityGroup, ipPermissionsToRemove)
 		if err != nil {
@@ -184,7 +185,14 @@ func (a *Aws) filterIpPermissions(ipPermissions []*ec2.IpPermission) []*ec2.IpPe
 	for _, ipPermission := range ipPermissions {
 		ipPermission.IpRanges = a.filterIpRanges(ipPermission.IpRanges)
 		ipPermission.Ipv6Ranges = a.filterIpv6Ranges(ipPermission.Ipv6Ranges)
-		filteredIpPermissions = append(filteredIpPermissions, ipPermission)
+		//Must be checked otherwise all security rules are removed for a certain port range and protocol
+		if len(ipPermission.IpRanges) != 0 || len(ipPermission.Ipv6Ranges) != 0 {
+			filteredIpPermissions = append(filteredIpPermissions, ipPermission)
+		}
+	}
+
+	if len(filteredIpPermissions) == 0 {
+		return nil
 	}
 
 	return filteredIpPermissions
