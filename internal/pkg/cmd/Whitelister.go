@@ -20,14 +20,14 @@ func NewWhitelisterCommand() *cobra.Command {
 }
 
 func startWhitelister(cmd *cobra.Command, args []string) {
-	logrus.Infof("Starting Whitelister")
+
 	// create the clientset
 	clientset, err := kube.GetClient()
 	if err != nil {
 		logrus.Panic(err)
 	}
 	if clientset != nil {
-		logrus.Infof("GOT CLIENT SET")
+		logrus.Infof("Starting Whitelister")
 	} else {
 		logrus.Panicf("Kube Client set not found.")
 	}
