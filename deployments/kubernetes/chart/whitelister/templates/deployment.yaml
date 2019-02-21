@@ -2,23 +2,23 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   annotations:
-    configmap.fabric8.io/update-on-change: {{ template "name" . }}
+    configmap.fabric8.io/update-on-change: {{ template "whitelister.name" . }}
   labels:
-{{ include "labels.stakater" . | indent 4 }}
-{{ include "labels.chart" . | indent 4 }}
-  name: {{ template "name" . }}
+{{ include "whitelister.labels.stakater" . | indent 4 }}
+{{ include "whitelister.labels.chart" . | indent 4 }}
+  name: {{ template "whitelister.name" . }}
 spec:
   replicas: 1
   revisionHistoryLimit: 2
   selector:
     matchLabels:
-{{ include "labels.selector" . | indent 6 }}
+{{ include "whitelister.labels.selector" . | indent 6 }}
   template:
     metadata:
       annotations:
-        configmap.fabric8.io/update-on-change: {{ template "name" . }}
+        configmap.fabric8.io/update-on-change: {{ template "whitelister.name" . }}
       labels:
-{{ include "labels.selector" . | indent 8 }}
+{{ include "whitelister.labels.selector" . | indent 8 }}
     spec:
       containers:
       - env:
@@ -30,13 +30,13 @@ spec:
           value: {{ .Values.whitelister.configFilePath }}
         image: "{{ .Values.whitelister.image.name }}:{{ .Values.whitelister.image.tag }}"
         imagePullPolicy: {{ .Values.whitelister.image.pullPolicy }}
-        name: {{ template "name" . }}
+        name: {{ template "whitelister.name" . }}
         volumeMounts:
         - mountPath: /configs
           name: config-volume
-      serviceAccountName: {{ template "name" . }}
+      serviceAccountName: {{ template "whitelister.name" . }}
       volumes:
       - configMap:
-          name: {{ template "name" . }}
+          name: {{ template "whitelister.name" . }}
         name: config-volume
               
