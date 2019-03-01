@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+{{ include "whitelister.labels.stakater" . | indent 4 }}
+{{ include "whitelister.labels.chart" . | indent 4 }}
+  name: {{ template "whitelister.name" . }}
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  labels: 
+{{ include "whitelister.labels.stakater" . | indent 4 }}
+{{ include "whitelister.labels.chart" . | indent 4 }}
+  name: {{ template "whitelister.name" . }}-role
+rules:
+  - apiGroups:
+      - ""
+    resources:      
+      - nodes
+      - services
+    verbs:
+      - list
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  labels: 
+{{ include "whitelister.labels.stakater" . | indent 4 }}
+{{ include "whitelister.labels.chart" . | indent 4 }}
+  name: {{ template "whitelister.name" . }}-role-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: {{ template "whitelister.name" . }}-role
+subjects:
+  - kind: ServiceAccount
+    name: {{ template "whitelister.name" . }}
+    namespace: {{ .Release.Namespace }}

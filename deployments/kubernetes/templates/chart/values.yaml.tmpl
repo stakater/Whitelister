@@ -1,0 +1,32 @@
+# Generated from deployments/kubernetes/templates/chart/values.yaml.tmpl
+
+kubernetes:
+  host: https://kubernetes.default
+
+whitelister:
+  labels:
+    provider: stakater
+    group: com.stakater.platform
+    version: {{ getenv "VERSION" }}
+  image:
+    name: {{ getenv "DOCKER_IMAGE" }}
+    tag: "{{ getenv "VERSION" }}"
+    pullPolicy: IfNotPresent
+  syncInterval: 10s
+  filter:
+    labelName: whitelister
+    labelValue: true
+  ipProviders:
+  - name: kubernetes
+    params:
+      FromPort: 0
+      ToPort: 65535
+      IpProtocol: tcp
+  provider:
+    name: aws
+    params:
+      KeepRuleDescriptionPrefix: "DO NOT REMOVE -"
+      RemoveRule: true
+      RoleArn: <aws-iam-role-arn>
+      Region: <aws-region>
+  configFilePath: /configs/config.yaml

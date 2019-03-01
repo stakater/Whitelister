@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+{{ include "whitelister.labels.stakater" . | indent 4 }}
+{{ include "whitelister.labels.chart" . | indent 4 }}
+  name: {{ template "whitelister.name" . }}
+data:
+  config.yaml: |-
+    syncInterval: {{ .Values.whitelister.syncInterval }}
+    filter:
+      labelName: {{ .Values.whitelister.filter.labelName }}
+      labelValue: {{ .Values.whitelister.filter.labelValue }}
+    ipProviders:
+    {{- range .Values.whitelister.ipProviders }}
+    - name: {{ .name }}
+      params:
+      {{- range $key, $value := .params }}
+        {{ $key }}: {{ $value }}
+      {{- end }}
+    {{- end }}    
+    provider:
+        name: {{ .Values.whitelister.provider.name }}
+        params:
+        {{- range $key, $value := .Values.whitelister.provider.params }}
+          {{ $key }}: {{ $value }}
+        {{- end }}

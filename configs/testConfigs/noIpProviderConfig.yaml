@@ -1,0 +1,4 @@
+syncInterval: 10s
+filter:
+  labelName: whitelister
+  labelValue: true
