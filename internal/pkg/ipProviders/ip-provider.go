@@ -4,6 +4,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/stakater/Whitelister/internal/pkg/config"
+	"github.com/stakater/Whitelister/internal/pkg/ipProviders/git"
 	"github.com/stakater/Whitelister/internal/pkg/ipProviders/kube"
 	"github.com/stakater/Whitelister/internal/pkg/utils"
 )
@@ -37,11 +38,9 @@ func MapToIpProvider(ipProviderName string) IpProvider {
 	switch ipProviderName {
 	case "kubernetes":
 		return &kube.Kube{}
+	case "git":
+		return &git.Git{}
 	}
 	logrus.Errorf("Cannot find an ip provider for : %s", ipProviderName)
 	return nil
-}
-
-var ipProviderMap = map[string]IpProvider{
-	"kubernetes": &kube.Kube{},
 }

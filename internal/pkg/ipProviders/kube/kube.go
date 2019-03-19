@@ -21,6 +21,7 @@ type Kube struct {
 	IpProtocol *string
 }
 
+// GetName returns the name of IP Provider
 func (k *Kube) GetName() string {
 	return "Kubernetes"
 }
