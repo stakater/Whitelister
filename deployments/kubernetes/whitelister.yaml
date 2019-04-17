@@ -1,0 +1,143 @@
+---
+# Source: whitelister/templates/deployment.yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    configmap.fabric8.io/update-on-change: whitelister
+  labels:
+    app: whitelister
+    group: com.stakater.platform
+    provider: stakater
+    version: 0.0.1
+    chart: "whitelister-0.0.1"
+    release: "RELEASE-NAME"
+    heritage: "Tiller"
+  name: whitelister
+spec:
+  replicas: 1
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: whitelister
+      group: com.stakater.platform
+      provider: stakater
+  template:
+    metadata:
+      annotations:
+        configmap.fabric8.io/update-on-change: whitelister
+      labels:
+        app: whitelister
+        group: com.stakater.platform
+        provider: stakater
+    spec:
+      containers:
+      - env:
+        - name: KUBERNETES_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: CONFIG_FILE_PATH
+          value: /configs/config.yaml
+        image: "stakater/whitelister:0.0.1"
+        imagePullPolicy: IfNotPresent
+        name: whitelister
+        volumeMounts:
+        - mountPath: /configs
+          name: config-volume
+      serviceAccountName: whitelister
+      volumes:
+      - configMap:
+          name: whitelister
+        name: config-volume
+              
+---
+# Source: whitelister/templates/rbac.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: whitelister
+    group: com.stakater.platform
+    provider: stakater
+    version: 0.0.1
+    chart: "whitelister-0.0.1"
+    release: "RELEASE-NAME"
+    heritage: "Tiller"
+  name: whitelister
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  labels: 
+    app: whitelister
+    group: com.stakater.platform
+    provider: stakater
+    version: 0.0.1
+    chart: "whitelister-0.0.1"
+    release: "RELEASE-NAME"
+    heritage: "Tiller"
+  name: whitelister-role
+rules:
+  - apiGroups:
+      - ""
+    resources:      
+      - nodes
+      - services
+    verbs:
+      - list
+      - get
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  labels: 
+    app: whitelister
+    group: com.stakater.platform
+    provider: stakater
+    version: 0.0.1
+    chart: "whitelister-0.0.1"
+    release: "RELEASE-NAME"
+    heritage: "Tiller"
+  name: whitelister-role-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: whitelister-role
+subjects:
+  - kind: ServiceAccount
+    name: whitelister
+    namespace: default
+---
+# Source: whitelister/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: whitelister
+    group: com.stakater.platform
+    provider: stakater
+    version: 0.0.1
+    chart: "whitelister-0.0.1"
+    release: "RELEASE-NAME"
+    heritage: "Tiller"
+  name: whitelister
+data:
+  config.yaml: |-
+    syncInterval: 10s
+    filter:
+      labelName: whitelister
+      labelValue: true
+    ipProviders:
+    - name: kubernetes
+      params:
+        FromPort: 0
+        IpProtocol: tcp
+        ToPort: 65535    
+    provider:
+        name: aws
+        params:
+          KeepRuleDescriptionPrefix: DO NOT REMOVE -
+          Region: <aws-region>
+          RemoveRule: true
+          RoleArn: <aws-iam-role-arn>

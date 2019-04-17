@@ -1,0 +1,33 @@
+---
+# Source: whitelister/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: whitelister
+    group: com.stakater.platform
+    provider: stakater
+    version: 0.0.1
+    chart: "whitelister-0.0.1"
+    release: "RELEASE-NAME"
+    heritage: "Tiller"
+  name: whitelister
+data:
+  config.yaml: |-
+    syncInterval: 10s
+    filter:
+      labelName: whitelister
+      labelValue: true
+    ipProviders:
+    - name: kubernetes
+      params:
+        FromPort: 0
+        IpProtocol: tcp
+        ToPort: 65535    
+    provider:
+        name: aws
+        params:
+          KeepRuleDescriptionPrefix: DO NOT REMOVE -
+          Region: <aws-region>
+          RemoveRule: true
+          RoleArn: <aws-iam-role-arn>
