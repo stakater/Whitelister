@@ -96,3 +96,4 @@ or contact us in case of professional services and queries on <hello@stakater.co
 
   [website]: http://stakater.com/
   [community]: https://github.com/stakater/
+  
