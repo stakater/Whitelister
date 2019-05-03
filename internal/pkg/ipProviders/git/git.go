@@ -71,7 +71,7 @@ func (g *Git) GetIPPermissions() ([]utils.IpPermission, error) {
 	if err != nil {
 		return nil, err
 	}
-	logrus.Infof("%v, %v, %v, %v, %v", *conf.IpPermissions[0].FromPort, *conf.IpPermissions[0].ToPort, *conf.IpPermissions[0].IpProtocol, *conf.IpPermissions[0].IpRanges[0].IpCidr, *conf.IpPermissions[0].IpRanges[0].Description)
+
 	return conf.IpPermissions, nil
 }
 
