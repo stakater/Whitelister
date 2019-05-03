@@ -1,0 +1,18 @@
+syncInterval: 10s
+filter:
+  labelName: whitelister
+  labelValue: true
+ipProviders:
+  - name: git
+    params:
+      AccessToken: "access-token"
+      URL: "http://github.com/stakater/whitelister-config.git"
+      Config: "config.yaml"
+provider:
+  name: aws
+  params:
+    KeepRuleDescriptionPrefix: "DO NOT REMOVE -"
+    RemoveRule: true
+    RoleArn: "arn:aws:iam::111111111111:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+    Region: us-west-2
+ 
