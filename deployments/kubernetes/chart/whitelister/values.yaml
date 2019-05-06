@@ -22,6 +22,11 @@ whitelister:
       FromPort: 0
       ToPort: 65535
       IpProtocol: tcp
+  - name: git
+    params:
+      AccessToken: "ACCESS_TOKEN"
+      URL: "http://github.com/example.git"
+      Config: "config.yaml"
   provider:
     name: aws
     params:
