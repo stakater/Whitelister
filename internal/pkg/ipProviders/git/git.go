@@ -15,7 +15,7 @@ import (
 )
 
 var pullOptions *git.PullOptions = &git.PullOptions{RemoteName: "origin"}
-var path = "/tmp/config"
+var path = "/tmp/whitelister-config"
 
 // Git Ip provider class implementing the IpProvider interface
 type Git struct {

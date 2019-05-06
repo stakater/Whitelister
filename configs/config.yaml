@@ -8,11 +8,16 @@ ipProviders:
       FromPort: 0 
       ToPort: 65535
       IpProtocol: tcp
+  - name: git
+    params:
+      AccessToken: "ACCESS_TOKEN"
+      URL: "http://github.com/example.git"
+      Config: "config.yaml"
 provider:
   name: aws
   params:
     KeepRuleDescriptionPrefix: "DO NOT REMOVE -"
     RemoveRule: true
-    RoleArn: <aws-iam-role-arn>
-    Region: <aws-region>
+    RoleArn: "arn:aws:iam::111111111111:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling"
+    Region: us-west-2
  

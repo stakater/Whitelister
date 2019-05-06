@@ -1,0 +1,7 @@
+ipPermissions:
+- fromPort: 80
+  toPort: 80
+  ipProtocol: "tcp"
+  ipRanges: 
+  - ipCidr: "127.0.0.1/32"
+    description: "Sample address"

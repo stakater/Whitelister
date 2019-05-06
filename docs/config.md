@@ -13,6 +13,11 @@ ipProviders:
       FromPort: 0
       ToPort: 65535
       IpProtocol: tcp
+  - name: git
+    params:
+      AccessToken: "ACCESS_TOKEN"
+      URL: "http://github.com/example.git"
+      Config: "config.yaml"
 provider:
   name: "aws"
   params:
@@ -39,6 +44,7 @@ provider:
 Whitelister supports the following IP Providers
 
 1. [Kubernetes](ipProviders/kubernetes.md)
+2. [GitHub](ipProviders/git.md)
 
 ## Providers
 
