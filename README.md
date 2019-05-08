@@ -1,4 +1,4 @@
-# Whitelister
+# ![](assets/web/whitelister-round-100px.png) Whitelister
 
 A tool to manage access to servers based on IP addresses and ports.
 
