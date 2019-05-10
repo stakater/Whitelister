@@ -2,25 +2,30 @@ package git
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 	"strings"
 	"testing"
 
-	"github.com/stakater/Whitelister/internal/pkg/test/utils"
+	"github.com/sirupsen/logrus"
+	testUtils "github.com/stakater/Whitelister/internal/pkg/test/utils"
+	utils "github.com/stakater/Whitelister/internal/pkg/utils"
 )
 
 var (
 	configFilePath = "../../../../configs/testConfigs/"
+	accessToken    = "access_token"
+	url            = "https://github.com/"
+	configFile     = "config.yaml"
+	testFile       = "sampleConfig.yaml"
+	emptyFile      = "Empty.yaml"
+	ipCidr         = "127.0.0.1/32"
+	description    = "Sample address"
+	fromPort       = int64(80)
+	toPort         = int64(80)
+	ipProtocol     = "tcp"
 )
 
 func TestGitInit(t *testing.T) {
-
-	var accessToken string
-	accessToken = "ABC"
-
-	var url string
-	url = "https://example.com/"
 
 	tests := []struct {
 		name     string
@@ -53,7 +58,18 @@ func TestGitInit(t *testing.T) {
 				"AccessToken": accessToken,
 				"URL":         url,
 			},
-			want:     &Git{AccessToken: accessToken, URL: url, Config: "config.yaml"},
+			want:     &Git{AccessToken: accessToken, URL: url, Config: configFile},
+			wantErr:  false,
+			errValue: nil,
+		},
+		{
+			name: "access token, url and config",
+			args: map[interface{}]interface{}{
+				"AccessToken": accessToken,
+				"URL":         url,
+				"Config":      configFile,
+			},
+			want:     &Git{AccessToken: accessToken, URL: url, Config: configFile},
 			wantErr:  false,
 			errValue: nil,
 		},
@@ -70,7 +86,7 @@ func TestGitInit(t *testing.T) {
 					return
 				}
 			}
-			if !(got.URL == tt.want.URL && got.AccessToken == tt.want.AccessToken) {
+			if !got.Equal(tt.want) {
 				t.Errorf("Got = %v, wanted %v", got, tt.want)
 			}
 		})
@@ -79,40 +95,56 @@ func TestGitInit(t *testing.T) {
 
 func TestReadConfig(t *testing.T) {
 
-	testFile := "sampleConfig.yaml"
-	EmptyFile := "Empty.yaml"
-
-	result, err := utils.CopyFile(configFilePath+testFile, "/tmp/whitelister-config/"+testFile)
+	result, err := testUtils.CopyFile(configFilePath+testFile, testFile, path)
 	if !result && err != nil {
 		t.Errorf("Cannot copy file. Error: %v", err)
 	}
 
-	result1, err1 := utils.CopyFile(configFilePath+EmptyFile, "/tmp/whitelister-config/"+EmptyFile)
-	if !result1 && err1 != nil {
-		t.Errorf("Cannot copy Emptyfile. Error: %v", err1)
+	result, err = testUtils.CopyFile(configFilePath+emptyFile, emptyFile, path)
+	if !result && err != nil {
+		t.Errorf("Cannot copy Emptyfile. Error: %v", err)
+	}
+
+	ipRanges := []*utils.IpRange{}
+	ipRanges = append(ipRanges, &utils.IpRange{
+		IpCidr:      &ipCidr,
+		Description: &description,
+	})
+
+	ipPermissions := []utils.IpPermission{
+		{
+			IpRanges:   ipRanges,
+			FromPort:   &fromPort,
+			ToPort:     &toPort,
+			IpProtocol: &ipProtocol,
+		},
 	}
 
 	tests := []struct {
-		name     string
-		args     Git
-		wantErr  bool
-		errValue error
+		name       string
+		args       Git
+		wantPerm   []utils.IpPermission
+		wantConfig Config
+		wantErr    bool
+		errValue   error
 	}{
 		{
-			name:     "Config Path",
-			args:     Git{AccessToken: "ABC", Config: EmptyFile + ".wrong", URL: "https://example.com"},
+			name:     "Wrong Config Path",
+			args:     Git{AccessToken: accessToken, Config: testFile + ".wrong", URL: url},
 			wantErr:  true,
 			errValue: errors.New("no such file or directory"),
 		},
 		{
-			name:     "Empty Config",
-			args:     Git{AccessToken: "ABC", Config: EmptyFile, URL: "https://example.com"},
-			wantErr:  false,
-			errValue: nil,
+			name:       "Empty Config",
+			args:       Git{AccessToken: accessToken, Config: emptyFile, URL: url},
+			wantConfig: Config{},
+			wantErr:    false,
+			errValue:   nil,
 		},
 		{
 			name:     "Correct Config",
-			args:     Git{AccessToken: "ABC", Config: testFile, URL: "https://example.com"},
+			args:     Git{AccessToken: accessToken, Config: testFile, URL: url},
+			wantPerm: ipPermissions,
 			wantErr:  false,
 			errValue: nil,
 		},
@@ -123,8 +155,6 @@ func TestReadConfig(t *testing.T) {
 			got := tt.args
 			config, err := got.readConfig()
 
-			fmt.Println(config)
-
 			if err != nil && tt.wantErr {
 				if !strings.Contains(err.Error(), tt.errValue.Error()) {
 					t.Errorf("Got = %v, wanted %v", err, tt.errValue.Error())
@@ -132,30 +162,30 @@ func TestReadConfig(t *testing.T) {
 				return
 			}
 
-			if err == nil && tt.wantErr {
-				t.Errorf("Wanted = %v, but got no error", err)
-				return
-			}
-
 			if err == nil && !tt.wantErr {
-				if reflect.DeepEqual(config, Config{}) {
-					fmt.Println("Empty Config File.")
-				}
-				for _, permission := range config.IpPermissions {
-					if permission.FromPort == nil {
-						t.Errorf("permission.FromPort not set")
-					}
-					if permission.ToPort == nil {
-						t.Errorf("permission.ToPort not set")
-					}
-					if permission.IpProtocol == nil {
-						t.Errorf("permission.IpProtocol not set")
-					}
-					if permission.IpRanges == nil {
-						t.Errorf("permission.IpRanges not set")
+				if !reflect.DeepEqual(config, tt.wantConfig) {
+					for _, gotPermission := range config.IpPermissions {
+						contains := false
+						for _, wantPermission := range tt.wantPerm {
+							if gotPermission.Equal(&wantPermission) {
+								contains = true
+							}
+						}
+						if !contains {
+							t.Errorf("Mismatch")
+							logrus.Println("Got:")
+							testUtils.PrintIpPermissionsStructure(config.IpPermissions)
+							logrus.Println("Wanted:")
+							testUtils.PrintIpPermissionsStructure(tt.wantPerm)
+							return
+						}
 					}
 				}
 			}
 		})
+	}
+	err = testUtils.DeleteDir(path)
+	if err != nil {
+		t.Error(err.Error())
 	}
 }

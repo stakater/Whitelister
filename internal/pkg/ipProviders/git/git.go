@@ -26,6 +26,16 @@ type Git struct {
 	workingTree *git.Worktree
 }
 
+// Equal Compares Git objects
+func (git1 *Git) Equal(git2 *Git) bool {
+	if git1.URL != git2.URL ||
+		git1.AccessToken != git2.AccessToken ||
+		git1.Config != git2.Config {
+		return false
+	}
+	return true
+}
+
 //Config stores IpPermissions read from config file.
 type Config struct {
 	IpPermissions []utils.IpPermission `yaml:"ipPermissions"`
