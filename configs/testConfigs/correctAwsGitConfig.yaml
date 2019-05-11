@@ -3,15 +3,10 @@ filter:
   labelName: whitelister
   labelValue: true
 ipProviders:
-  - name: kubernetes
-    params:
-      FromPort: 0 
-      ToPort: 65535
-      IpProtocol: tcp
   - name: git
     params:
-      AccessToken: "ACCESS_TOKEN"
-      URL: "http://github.com/example.git"
+      AccessToken: "access-token"
+      URL: "http://github.com/stakater/whitelister-config.git"
       Config: "config.yaml"
 provider:
   name: aws

@@ -50,9 +50,11 @@ This is where Whitelister comes to the resuce. It can automatically detect new s
 ## Help
 
 ### Documentation
+
 You can find more documentation [here](docs/)
 
 ### Have a question?
+
 File a GitHub [issue](https://github.com/stakater/Whitelister/issues), or send us an [email](mailto:stakater@gmail.com).
 
 ### Talk to us on Slack

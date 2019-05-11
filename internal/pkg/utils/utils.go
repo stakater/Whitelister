@@ -7,10 +7,10 @@ import (
 )
 
 type IpPermission struct {
-	IpRanges   []*IpRange
-	FromPort   *int64
-	ToPort     *int64
-	IpProtocol *string
+	IpRanges   []*IpRange `yaml:"ipRanges"`
+	FromPort   *int64     `yaml:"fromPort"`
+	ToPort     *int64     `yaml:"toPort"`
+	IpProtocol *string    `yaml:"ipProtocol"`
 }
 
 func (ipPermission1 *IpPermission) Equal(ipPermission2 *IpPermission) bool {
@@ -38,10 +38,11 @@ func (ipPermission1 *IpPermission) Equal(ipPermission2 *IpPermission) bool {
 }
 
 type IpRange struct {
-	IpCidr      *string
-	Description *string
+	IpCidr      *string `yaml:"ipCidr"`
+	Description *string `yaml:"description"`
 }
 
+//Equal compares IPRanges
 func (ipRange1 *IpRange) Equal(ipRange2 *IpRange) bool {
 	return *ipRange1.IpCidr == *ipRange2.IpCidr && *ipRange1.Description == *ipRange2.Description
 }
