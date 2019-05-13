@@ -4,13 +4,13 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   annotations:
-    configmap.fabric8.io/update-on-change: whitelister
+    reloader.stakater.com/auto: "true"
   labels:
     app: whitelister
     group: com.stakater.platform
     provider: stakater
-    version: 0.0.4
-    chart: "whitelister-0.0.4"
+    version: 0.0.5
+    chart: "whitelister-0.0.5"
     release: "RELEASE-NAME"
     heritage: "Tiller"
   name: whitelister
@@ -39,7 +39,7 @@ spec:
               fieldPath: metadata.namespace
         - name: CONFIG_FILE_PATH
           value: /configs/config.yaml
-        image: "stakater/whitelister:0.0.4"
+        image: "stakater/whitelister:0.0.5"
         imagePullPolicy: IfNotPresent
         name: whitelister
         volumeMounts:
@@ -60,8 +60,8 @@ metadata:
     app: whitelister
     group: com.stakater.platform
     provider: stakater
-    version: 0.0.4
-    chart: "whitelister-0.0.4"
+    version: 0.0.5
+    chart: "whitelister-0.0.5"
     release: "RELEASE-NAME"
     heritage: "Tiller"
   name: whitelister
@@ -73,8 +73,8 @@ metadata:
     app: whitelister
     group: com.stakater.platform
     provider: stakater
-    version: 0.0.4
-    chart: "whitelister-0.0.4"
+    version: 0.0.5
+    chart: "whitelister-0.0.5"
     release: "RELEASE-NAME"
     heritage: "Tiller"
   name: whitelister-role
@@ -95,8 +95,8 @@ metadata:
     app: whitelister
     group: com.stakater.platform
     provider: stakater
-    version: 0.0.4
-    chart: "whitelister-0.0.4"
+    version: 0.0.5
+    chart: "whitelister-0.0.5"
     release: "RELEASE-NAME"
     heritage: "Tiller"
   name: whitelister-role-binding
@@ -117,8 +117,8 @@ metadata:
     app: whitelister
     group: com.stakater.platform
     provider: stakater
-    version: 0.0.4
-    chart: "whitelister-0.0.4"
+    version: 0.0.5
+    chart: "whitelister-0.0.5"
     release: "RELEASE-NAME"
     heritage: "Tiller"
   name: whitelister
@@ -133,7 +133,12 @@ data:
       params:
         FromPort: 0
         IpProtocol: tcp
-        ToPort: 65535    
+        ToPort: 65535
+    - name: git
+      params:
+        AccessToken: ACCESS_TOKEN
+        Config: config.yaml
+        URL: http://github.com/example.git    
     provider:
         name: aws
         params:
