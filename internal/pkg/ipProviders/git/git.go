@@ -14,7 +14,6 @@ import (
 	"github.com/stakater/Whitelister/internal/pkg/utils"
 )
 
-var pullOptions *git.PullOptions = &git.PullOptions{RemoteName: "origin"}
 var path = "/tmp/whitelister-config"
 
 // Git Ip provider class implementing the IpProvider interface
@@ -142,6 +141,13 @@ func (g *Git) printLatestCommit() {
 }
 
 func (g *Git) pullRepository() error {
+	var pullOptions *git.PullOptions = &git.PullOptions{
+		RemoteName: "origin",
+		Auth: &http.BasicAuth{
+			Username: "Stakater", //can be anything except empty string
+			Password: g.AccessToken,
+		},
+	}
 	err := g.workingTree.Pull(pullOptions)
 
 	if err != nil {
