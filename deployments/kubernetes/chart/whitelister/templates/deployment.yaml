@@ -2,7 +2,7 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   annotations:
-    configmap.fabric8.io/update-on-change: {{ template "whitelister.name" . }}
+    reloader.stakater.com/auto: "true"
   labels:
 {{ include "whitelister.labels.stakater" . | indent 4 }}
 {{ include "whitelister.labels.chart" . | indent 4 }}
