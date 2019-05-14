@@ -4,13 +4,13 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   annotations:
-    configmap.fabric8.io/update-on-change: whitelister
+    reloader.stakater.com/auto: "true"
   labels:
     app: whitelister
     group: com.stakater.platform
     provider: stakater
-    version: 0.0.4
-    chart: "whitelister-0.0.4"
+    version: 0.0.5
+    chart: "whitelister-0.0.5"
     release: "RELEASE-NAME"
     heritage: "Tiller"
   name: whitelister
@@ -39,7 +39,7 @@ spec:
               fieldPath: metadata.namespace
         - name: CONFIG_FILE_PATH
           value: /configs/config.yaml
-        image: "stakater/whitelister:0.0.4"
+        image: "stakater/whitelister:0.0.5"
         imagePullPolicy: IfNotPresent
         name: whitelister
         volumeMounts:
