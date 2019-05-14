@@ -137,3 +137,27 @@ func IsInt64Equal(val1 *int64, val2 *int64) bool {
 		return *val1 == *val2
 	}
 }
+
+// CombineIpPermission merges permissions into existing permissions with same port and protocol
+func CombineIpPermission(ipPermissions []IpPermission, permissionsToAdd []IpPermission) []IpPermission {
+	isMatchingPermission := false
+	for _, permissionToAdd := range permissionsToAdd {
+		for index, ipPermission := range ipPermissions {
+			if *ipPermission.FromPort == *permissionToAdd.FromPort &&
+				*ipPermission.ToPort == *permissionToAdd.ToPort &&
+				*ipPermission.IpProtocol == *permissionToAdd.IpProtocol {
+
+				isMatchingPermission = true
+				ipPermissions[index].IpRanges = append(ipPermission.IpRanges, permissionToAdd.IpRanges...)
+				break
+			}
+		}
+		if isMatchingPermission {
+			isMatchingPermission = false
+		} else {
+			ipPermissions = append(ipPermissions, permissionToAdd)
+		}
+	}
+
+	return ipPermissions
+}

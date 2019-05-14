@@ -38,7 +38,7 @@ func (t *Task) PerformTasks() {
 		if err != nil {
 			logrus.Errorf("Error getting Ip list from provider: %s\n err: %v", ipProvider.GetName(), err)
 		}
-		combinedIpPermissions = append(combinedIpPermissions, ipList...)
+		combinedIpPermissions = utils.CombineIpPermission(combinedIpPermissions, ipList)
 	}
 
 	loadBalancerNames := t.getLoadBalancerNames(t.config.Filter)
