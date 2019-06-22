@@ -1,8 +1,22 @@
 # ![](assets/web/whitelister-round-100px.png) Whitelister
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/stakater/whitelister?style=flat-square)](https://goreportcard.com/report/github.com/stakater/whitelister)
+[![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](http://godoc.org/github.com/stakater/whitelister)
+[![Release](https://img.shields.io/github/release/stakater/whitelister.svg?style=flat-square)](https://github.com/stakater/whitelister/releases/latest)
+[![GitHub tag](https://img.shields.io/github/tag/stakater/whitelister.svg?style=flat-square)](https://github.com/stakater/whitelister/releases/latest)
+[![Docker Pulls](https://img.shields.io/docker/pulls/stakater/whitelister.svg?style=flat-square)](https://hub.docker.com/r/stakater/whitelister/)
+[![Docker Stars](https://img.shields.io/docker/stars/stakater/whitelister.svg?style=flat-square)](https://hub.docker.com/r/stakater/whitelister/)
+[![MicroBadger Size](https://img.shields.io/microbadger/image-size/stakater/whitelister.svg?style=flat-square)](https://microbadger.com/images/stakater/whitelister)
+[![MicroBadger Layers](https://img.shields.io/microbadger/layers/stakater/whitelister.svg?style=flat-square)](https://microbadger.com/images/stakater/whitelister)
+[![license](https://img.shields.io/github/license/stakater/whitelister.svg?style=flat-square)](LICENSE)
+[![Get started with Stakater](https://stakater.github.io/README/stakater-github-banner.png)](http://stakater.com/?utm_source=whitelister&utm_medium=github)
+
+## Problem
+
+We would like to restrict access to servers to specific addresses only and keep audit trail of IP addresses allowed. 
 A tool to manage access to servers based on IP addresses and ports.
 
-## Usage
+## Solution
 
 Whitelister can be used to manage security group rules that control access to servers on different ports.
 
@@ -43,9 +57,10 @@ helm install stakater/whitelister --namespace test
 
 ## Use Case
 
-Let's say that using [Scaler](https://github.com/stakater/scaler), you stop/destroy your dev severs at night and start/create them again in the morning for cost saving. This can cause your servers to have new IP addresses every day and it can be a tedious job to add IP addresses of multiple Servers to multiple Security Groups everyday.
+- Let's say that using [Scaler](https://github.com/stakater/scaler), you stop/destroy your dev severs at night and start/create them again in the morning for cost saving. This can cause your servers to have new IP addresses every day and it can be a tedious job to add IP addresses of multiple Servers to multiple Security Groups everyday.
 
-This is where Whitelister comes to the resuce. It can automatically detect new server creation by fetching nodes from Kubernetes and then modify security group of selected Ingress to add Ip addresses of new servers and optionally delete IP Addresses for old servers.
+  This is where Whitelister comes to the rescue. It can automatically detect new server creation by fetching nodes from Kubernetes and then modify security group of selected Ingress to add Ip addresses of new servers and optionally delete IP Addresses for old servers.
+- Let's say you have a large team and you don't want to share cloud access with everyone. Now in order to still allow them to be able to access IP restricted servers, you can use a GIT repo which maintains a list of allowed IP addresses and users can add and remove the IP addresses there.
 
 ## Help
 
