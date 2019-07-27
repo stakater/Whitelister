@@ -1,5 +1,6 @@
 # ![](assets/web/whitelister-round-100px.png) Whitelister
 
+
 [![Go Report Card](https://goreportcard.com/badge/github.com/stakater/whitelister?style=flat-square)](https://goreportcard.com/report/github.com/stakater/whitelister)
 [![Go Doc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](http://godoc.org/github.com/stakater/whitelister)
 [![Release](https://img.shields.io/github/release/stakater/whitelister.svg?style=flat-square)](https://github.com/stakater/whitelister/releases/latest)
