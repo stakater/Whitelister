@@ -1,6 +1,6 @@
 # Amazon Web Services (AWS)
 
-Amazon can be used as a cloud provider where your servers reside. The current provider can add a list of IP rules to the security group and optionally remove previously added security rules. If you wish to keep some of the hard coded rules then you can add a certain prefix to their description and Whitelister will not remove those
+Amazon can be used as a cloud provider where your servers reside. The current provider can add a list of IP rules to the security group and optionally remove previously added security rules. If you wish to keep some of the hard coded rules then you can add a certain prefix to their description and Whitelister will not remove them.
 
 ## Configuration
 

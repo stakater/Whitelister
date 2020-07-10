@@ -1,5 +1,5 @@
 FROM golang:1.13.1-alpine
-MAINTAINER "Stakater Team"
+LABEL maintainer "Stakater Team"
 
 RUN apk update
 

@@ -25,7 +25,7 @@ func TestReadConfig(t *testing.T) {
 			want: Config{
 				SyncInterval: "10s",
 				IpProviders: []IpProvider{
-					IpProvider{
+					{
 						Name: "kubernetes",
 						Params: map[interface{}]interface{}{
 							"FromPort":   0,

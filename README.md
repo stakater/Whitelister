@@ -66,7 +66,7 @@ helm install stakater/whitelister --namespace test
 
 ### Documentation
 
-You can find more documentation [here](docs/)
+You can find more documentation [here](docs)
 
 ### Have a question?
 

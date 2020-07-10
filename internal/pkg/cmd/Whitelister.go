@@ -37,7 +37,7 @@ func startWhitelister(cmd *cobra.Command, args []string) {
 
 	controller, err := controller.NewController(clientset, config)
 	if err != nil {
-		logrus.Errorf("Error occured while creating controller. Reason: %s", err.Error())
+		logrus.Errorf("Error occurred while creating controller. Reason: %s", err.Error())
 		return
 	}
 
