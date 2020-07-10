@@ -1,6 +1,7 @@
 package kube
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
@@ -56,7 +57,7 @@ func (k *Kube) GetIPPermissions() ([]utils.IpPermission, error) {
 
 func (k *Kube) getNodesIPPermissions(client v1.CoreV1Interface) ([]utils.IpPermission, error) {
 
-	nodes, err := client.Nodes().List(meta_v1.ListOptions{})
+	nodes, err := client.Nodes().List(context.TODO(), meta_v1.ListOptions{})
 
 	if err != nil {
 		return nil, err
