@@ -34,6 +34,9 @@ func (k *Kube) Init(params map[interface{}]interface{}) error {
 		return err
 	}
 
+	if k == nil {
+		return errors.New("Missing Kube From Port")
+	}
 	if k.FromPort == nil {
 		return errors.New("Missing Kube From Port")
 	}
