@@ -1,6 +1,7 @@
 package config
 
 import (
+	"errors"
 	"reflect"
 	"testing"
 )
@@ -14,10 +15,11 @@ func TestReadConfig(t *testing.T) {
 		filePath string
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    Config
-		wantErr bool
+		name     string
+		args     args
+		want     Config
+		wantErr  bool
+		errValue error
 	}{
 		{
 			name: "TestingWithCorrectValues",
@@ -44,10 +46,48 @@ func TestReadConfig(t *testing.T) {
 					},
 				},
 				Filter: Filter{
+					FilterType: LoadBalancer,
 					LabelName:  "whitelister",
 					LabelValue: "true",
 				},
 			},
+		},
+		{
+			name: "TestingWithCorrectValuesForSecurityGroupFilter",
+			args: args{filePath: configFilePath + "correctAwsGitConfigWithSG.yaml"},
+			want: Config{
+				SyncInterval: "10s",
+				IpProviders: []IpProvider{
+					{
+						Name: "git",
+						Params: map[interface{}]interface{}{
+							"AccessToken": "access-token",
+							"URL":         "http://github.com/stakater/whitelister-config.git",
+							"Config":      "config.yaml",
+						},
+					},
+				},
+				Provider: Provider{
+					Name: "aws",
+					Params: map[interface{}]interface{}{
+						"RoleArn":                   "arn:aws:iam::111111111111:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling",
+						"Region":                    "us-west-2",
+						"RemoveRule":                true,
+						"KeepRuleDescriptionPrefix": "DO NOT REMOVE -",
+					},
+				},
+				Filter: Filter{
+					FilterType: SecurityGroup,
+					LabelName:  "whitelister",
+					LabelValue: "true",
+				},
+			},
+		},
+		{
+			name:     "TestingWithIncorrectFilterType",
+			args:     args{filePath: configFilePath + "configWithIncorrectFilterType.yaml"},
+			wantErr:  true,
+			errValue: errors.New("incorrect FilterType :InCorrectType provided"),
 		},
 		{
 			name: "TestingWithEmptyFile",
@@ -63,8 +103,15 @@ func TestReadConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := ReadConfig(tt.args.filePath)
-			if (err != nil) != tt.wantErr {
+			if err == nil && tt.wantErr {
 				t.Errorf("ReadConfig() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if err != nil && tt.wantErr && tt.errValue != nil {
+				if err.Error() != tt.errValue.Error() {
+					t.Errorf("ReadConfig() error %v, wantErr %v", err, tt.errValue)
+					return
+				}
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {

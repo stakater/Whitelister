@@ -43,15 +43,22 @@ func (t *Task) PerformTasks() {
 		combinedIPPermissions = utils.CombineIpPermission(combinedIPPermissions, ipList)
 	}
 
-	loadBalancerNames := t.getLoadBalancerNames(t.config.Filter)
+	if t.config.Filter.FilterType == config.LoadBalancer {
+		loadBalancerNames := t.getLoadBalancerNames(t.config.Filter)
+		logrus.Info("load balancer names: ", loadBalancerNames[0])
 
-	if len(loadBalancerNames) > 0 {
-		t.provider.WhiteListIps(loadBalancerNames, combinedIPPermissions)
+		if len(loadBalancerNames) > 0 {
+			_ = t.provider.WhiteListIpsByLoadBalancer(loadBalancerNames, combinedIPPermissions)
+		} else {
+			logrus.Errorf("Cannot find any services with label name: " + t.config.Filter.LabelName +
+				" , label value: " + t.config.Filter.LabelValue)
+		}
+	} else if t.config.Filter.FilterType == config.SecurityGroup {
+		filterLabel := []string{t.config.Filter.LabelName, t.config.Filter.LabelValue}
+		_ = t.provider.WhiteListIpsBySecurityGroup(filterLabel, combinedIPPermissions)
 	} else {
-		logrus.Errorf("Cannot find any services with label name: " + t.config.Filter.LabelName +
-			" , label value: " + t.config.Filter.LabelValue)
+		logrus.Errorf("Unrecognized filter " + t.config.Filter.LabelName)
 	}
-
 }
 
 // Get Load Balancer names
@@ -64,7 +71,7 @@ func (t *Task) getLoadBalancerNames(filter config.Filter) []string {
 		logrus.Fatal(err)
 	}
 
-	loadBalancerNames := []string{}
+	var loadBalancerNames []string
 	var loadBalancerDNSName string
 
 	for _, service := range services.Items {

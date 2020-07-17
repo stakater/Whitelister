@@ -11,7 +11,8 @@ import (
 // Provider interface so that providers like aws, google cloud can implement this
 type Provider interface {
 	Init(map[interface{}]interface{}) error
-	WhiteListIps(resourceIds []string, ipPermissions []utils.IpPermission) error
+	WhiteListIpsByLoadBalancer(resourceIds []string, ipPermissions []utils.IpPermission) error
+	WhiteListIpsBySecurityGroup(filterLabel []string, ipPermissions []utils.IpPermission) error
 }
 
 // PopulateFromConfig populates the IpProvider from config

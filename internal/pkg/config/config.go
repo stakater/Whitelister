@@ -10,10 +10,10 @@ import (
 
 // Config which would be read from the config.yaml
 type Config struct {
-	SyncInterval    string       `yaml:"syncInterval"`
-	IpProviders     []IpProvider `yaml:"ipProviders"`
-	Provider        Provider     `yaml:"provider"`
-	Filter          Filter       `yaml:"filter"`
+	SyncInterval string       `yaml:"syncInterval"`
+	IpProviders  []IpProvider `yaml:"ipProviders"`
+	Provider     Provider     `yaml:"provider"`
+	Filter       Filter       `yaml:"filter"`
 }
 
 // IpProvider that the controller will be using to gather whitelist IPs
@@ -30,8 +30,9 @@ type Provider struct {
 
 // Filter that will be used to filter resources on the provider
 type Filter struct {
-	LabelName  string `yaml:"labelName"`
-	LabelValue string `yaml:"labelValue"`
+	FilterType FilterType `yaml:"filterType"`
+	LabelName  string     `yaml:"labelName"`
+	LabelValue string     `yaml:"labelValue"`
 }
 
 // ReadConfig function that reads the yaml file
