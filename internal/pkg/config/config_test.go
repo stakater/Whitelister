@@ -46,7 +46,7 @@ func TestReadConfig(t *testing.T) {
 					},
 				},
 				Filter: Filter{
-					FilterType: LoadBalancer,
+					FilterType: loadBalancer,
 					LabelName:  "whitelister",
 					LabelValue: "true",
 				},
@@ -77,7 +77,7 @@ func TestReadConfig(t *testing.T) {
 					},
 				},
 				Filter: Filter{
-					FilterType: SecurityGroup,
+					FilterType: securityGroup,
 					LabelName:  "whitelister",
 					LabelValue: "true",
 				},

@@ -43,7 +43,7 @@ func (t *Task) PerformTasks() {
 		combinedIPPermissions = utils.CombineIpPermission(combinedIPPermissions, ipList)
 	}
 
-	if t.config.Filter.FilterType == config.LoadBalancer {
+	if t.config.Filter.FilterType.String() == config.LoadBalancerStr {
 		loadBalancerNames := t.getLoadBalancerNames(t.config.Filter)
 		logrus.Info("load balancer names: ", loadBalancerNames[0])
 
@@ -53,7 +53,7 @@ func (t *Task) PerformTasks() {
 			logrus.Errorf("Cannot find any services with label name: " + t.config.Filter.LabelName +
 				" , label value: " + t.config.Filter.LabelValue)
 		}
-	} else if t.config.Filter.FilterType == config.SecurityGroup {
+	} else if t.config.Filter.FilterType.String() == config.SecurityGroupStr {
 		filterLabel := []string{t.config.Filter.LabelName, t.config.Filter.LabelValue}
 		_ = t.provider.WhiteListIpsBySecurityGroup(filterLabel, combinedIPPermissions)
 	} else {

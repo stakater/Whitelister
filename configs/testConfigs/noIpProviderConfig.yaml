@@ -1,5 +1,5 @@
 syncInterval: 10s
 filter:
-  filterType: LoadBalancer
+  filterType: loadBalancer
   labelName: whitelister
   labelValue: true

@@ -5,17 +5,20 @@ import "fmt"
 type FilterType int
 
 const (
-	LoadBalancer FilterType = iota
-	SecurityGroup
+	loadBalancer FilterType = iota
+	securityGroup
 )
+
+var LoadBalancerStr = "loadBalancer"
+var SecurityGroupStr = "securityGroup"
 
 func (filterType FilterType) String() string {
 	filterTypes := [...]string{
-		"LoadBalancer",
-		"SecurityGroup",
+		"loadBalancer",
+		"securityGroup",
 	}
 
-	if filterType < LoadBalancer || filterType > SecurityGroup {
+	if filterType < loadBalancer || filterType > securityGroup {
 		return "Unknown"
 	}
 
@@ -24,11 +27,11 @@ func (filterType FilterType) String() string {
 
 func toFilterType(s string) (u FilterType, err error) {
 	switch s {
-	case "LoadBalancer":
-		u = LoadBalancer
+	case "loadBalancer":
+		u = loadBalancer
 
-	case "SecurityGroup":
-		u = SecurityGroup
+	case "securityGroup":
+		u = securityGroup
 
 	default:
 		err = fmt.Errorf("incorrect FilterType :%s provided", s)
