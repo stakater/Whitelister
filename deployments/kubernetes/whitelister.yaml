@@ -7,8 +7,8 @@ metadata:
     app: whitelister
     group: com.stakater.platform
     provider: stakater
-    version: v0.0.12
-    chart: "whitelister-v0.0.12"
+    version: v0.0.13
+    chart: "whitelister-v0.0.13"
     release: "whitelister"
     heritage: "Tiller"
   name: whitelister
@@ -47,8 +47,8 @@ metadata:
     app: whitelister
     group: com.stakater.platform
     provider: stakater
-    version: v0.0.12
-    chart: "whitelister-v0.0.12"
+    version: v0.0.13
+    chart: "whitelister-v0.0.13"
     release: "whitelister"
     heritage: "Tiller"
   name: whitelister
@@ -77,7 +77,7 @@ spec:
               fieldPath: metadata.namespace
         - name: CONFIG_FILE_PATH
           value: /configs/config.yaml
-        image: "stakater/whitelister:v0.0.12"
+        image: "stakater/whitelister:v0.0.13"
         imagePullPolicy: IfNotPresent
         name: whitelister
         volumeMounts:
@@ -98,8 +98,8 @@ metadata:
     app: whitelister
     group: com.stakater.platform
     provider: stakater
-    version: v0.0.12
-    chart: "whitelister-v0.0.12"
+    version: v0.0.13
+    chart: "whitelister-v0.0.13"
     release: "whitelister"
     heritage: "Tiller"
   name: whitelister
@@ -111,8 +111,8 @@ metadata:
     app: whitelister
     group: com.stakater.platform
     provider: stakater
-    version: v0.0.12
-    chart: "whitelister-v0.0.12"
+    version: v0.0.13
+    chart: "whitelister-v0.0.13"
     release: "whitelister"
     heritage: "Tiller"
   name: whitelister-role
@@ -133,8 +133,8 @@ metadata:
     app: whitelister
     group: com.stakater.platform
     provider: stakater
-    version: v0.0.12
-    chart: "whitelister-v0.0.12"
+    version: v0.0.13
+    chart: "whitelister-v0.0.13"
     release: "whitelister"
     heritage: "Tiller"
   name: whitelister-role-binding
