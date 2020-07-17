@@ -7,10 +7,10 @@ whitelister:
   labels:
     provider: stakater
     group: com.stakater.platform
-    version: v0.0.12
+    version: v0.0.13
   image:
     name: stakater/whitelister
-    tag: "v0.0.12"
+    tag: "v0.0.13"
     pullPolicy: IfNotPresent
   syncInterval: 10s
   filter:
