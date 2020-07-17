@@ -36,7 +36,7 @@ func TestKubeInit(t *testing.T) {
 			args:     nil,
 			want:     &Kube{},
 			wantErr:  true,
-			errValue: errors.New("Missing Kube From Port"),
+			errValue: errors.New("missing kube params in config"),
 		},
 		{
 			name:     "Empty Config",
