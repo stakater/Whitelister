@@ -6,16 +6,12 @@ import (
 	"reflect"
 	"testing"
 
-	corev1 "k8s.io/api/core/v1"
+	coreV1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
 
-	test_utils "github.com/stakater/Whitelister/internal/pkg/test/utils"
+	testUtils "github.com/stakater/Whitelister/internal/pkg/test/utils"
 	"github.com/stakater/Whitelister/internal/pkg/utils"
-)
-
-var (
-	configFilePath = "../../../configs/testConfigs/"
 )
 
 func TestKubeInit(t *testing.T) {
@@ -40,7 +36,7 @@ func TestKubeInit(t *testing.T) {
 			args:     nil,
 			want:     &Kube{},
 			wantErr:  true,
-			errValue: errors.New("Missing Kube From Port"),
+			errValue: errors.New("missing kube params in config"),
 		},
 		{
 			name:     "Empty Config",
@@ -115,15 +111,15 @@ func TestGetNodesIPPermissions(t *testing.T) {
 	kube := Kube{}
 	kube.Init(map[interface{}]interface{}{"FromPort": int64(0), "ToPort": int64(65535), "IpProtocol": "tcp"})
 
-	nodesList := []runtime.Object{}
-	ipRanges := []*utils.IpRange{}
+	var nodesList []runtime.Object
+	var ipRanges []*utils.IpRange
 
 	for i := 1; i < 3; i++ {
 		ipCidr := fmt.Sprintf("127.0.0.%d/32", i)
 		ipAddr := fmt.Sprintf("127.0.0.%d", i)
 		name := fmt.Sprintf("node-%d", i)
 
-		nodesList = append(nodesList, test_utils.Node(name, ipAddr))
+		nodesList = append(nodesList, testUtils.Node(name, ipAddr))
 
 		ipRanges = append(ipRanges, &utils.IpRange{
 			IpCidr:      &ipCidr,
@@ -208,20 +204,20 @@ func TestGetNodeIPPermissions(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		args     corev1.Node
+		args     coreV1.Node
 		want     *utils.IpRange
 		wantErr  bool
 		errValue error
 	}{
 		{
 			name:     "Node without External IP",
-			args:     *test_utils.Node(name, ""),
+			args:     *testUtils.Node(name, ""),
 			wantErr:  true,
 			errValue: fmt.Errorf("No ExternalIP for Node: %s", name),
 		},
 		{
 			name: "Node with External IP",
-			args: *test_utils.Node(name, ipAddr),
+			args: *testUtils.Node(name, ipAddr),
 			want: &utils.IpRange{
 				IpCidr:      &ipCidr,
 				Description: &name,

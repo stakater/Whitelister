@@ -18,7 +18,7 @@ type IpProvider interface {
 
 // PopulateFromConfig populates the IpProvider from config
 func PopulateFromConfig(configIpProviders []config.IpProvider) []IpProvider {
-	populatedIpProviders := []IpProvider{}
+	var populatedIpProviders []IpProvider
 	for _, configIpProvider := range configIpProviders {
 		ipProviderToAdd := MapToIpProvider(configIpProvider.Name)
 		if ipProviderToAdd != nil {

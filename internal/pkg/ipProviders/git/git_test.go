@@ -2,13 +2,13 @@ package git
 
 import (
 	"errors"
+	"github.com/stakater/Whitelister/internal/pkg/utils"
 	"reflect"
 	"strings"
 	"testing"
 
 	"github.com/sirupsen/logrus"
 	testUtils "github.com/stakater/Whitelister/internal/pkg/test/utils"
-	utils "github.com/stakater/Whitelister/internal/pkg/utils"
 )
 
 var (
@@ -105,7 +105,7 @@ func TestReadConfig(t *testing.T) {
 		t.Errorf("Cannot copy Emptyfile. Error: %v", err)
 	}
 
-	ipRanges := []*utils.IpRange{}
+	var ipRanges []*utils.IpRange
 	ipRanges = append(ipRanges, &utils.IpRange{
 		IpCidr:      &ipCidr,
 		Description: &description,

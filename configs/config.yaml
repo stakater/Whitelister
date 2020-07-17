@@ -5,7 +5,7 @@ filter:
 ipProviders:
   - name: kubernetes
     params:
-      FromPort: 0 
+      FromPort: 0
       ToPort: 65535
       IpProtocol: tcp
   - name: git

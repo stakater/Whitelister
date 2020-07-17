@@ -1,13 +1,14 @@
 package kube
 
 import (
+	"context"
 	"errors"
 	"fmt"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/sirupsen/logrus"
-	corev1 "k8s.io/api/core/v1"
-	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	coreV1 "k8s.io/api/core/v1"
+	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v1 "k8s.io/client-go/kubernetes/typed/core/v1"
 
 	"github.com/stakater/Whitelister/internal/pkg/utils"
@@ -33,6 +34,9 @@ func (k *Kube) Init(params map[interface{}]interface{}) error {
 		return err
 	}
 
+	if k == nil {
+		return errors.New("missing kube params in config")
+	}
 	if k.FromPort == nil {
 		return errors.New("Missing Kube From Port")
 	}
@@ -56,13 +60,13 @@ func (k *Kube) GetIPPermissions() ([]utils.IpPermission, error) {
 
 func (k *Kube) getNodesIPPermissions(client v1.CoreV1Interface) ([]utils.IpPermission, error) {
 
-	nodes, err := client.Nodes().List(meta_v1.ListOptions{})
+	nodes, err := client.Nodes().List(context.TODO(), metaV1.ListOptions{})
 
 	if err != nil {
 		return nil, err
 	}
 
-	ipRanges := []*utils.IpRange{}
+	var ipRanges []*utils.IpRange
 
 	for _, node := range nodes.Items {
 		ipRange, err := k.getNodeIPRange(node)
@@ -85,13 +89,13 @@ func (k *Kube) getNodesIPPermissions(client v1.CoreV1Interface) ([]utils.IpPermi
 }
 
 // getNodeIPPermissions - Get IP permission based on ExternalIP of node
-func (k *Kube) getNodeIPRange(node corev1.Node) (*utils.IpRange, error) {
+func (k *Kube) getNodeIPRange(node coreV1.Node) (*utils.IpRange, error) {
 	for _, address := range node.Status.Addresses {
 		if address.Type == "ExternalIP" {
 			ipCidr := address.Address + "/32"
 			return &utils.IpRange{
 				IpCidr:      &(ipCidr),
-				Description: (&(node.Name)),
+				Description: &(node.Name),
 			}, nil
 		}
 	}

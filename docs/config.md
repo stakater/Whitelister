@@ -44,7 +44,7 @@ provider:
 Whitelister supports the following IP Providers
 
 1. [Kubernetes](ipProviders/kubernetes.md)
-2. [GitHub](ipProviders/git.md)
+2. [GitHub](ipProviders/github.md)
 
 ## Providers
 
