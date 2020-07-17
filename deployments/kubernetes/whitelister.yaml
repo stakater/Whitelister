@@ -1,4 +1,42 @@
 ---
+# Source: whitelister/templates/configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: whitelister
+    group: com.stakater.platform
+    provider: stakater
+    version: v0.0.11
+    chart: "whitelister-v0.0.11"
+    release: "whitelister"
+    heritage: "Tiller"
+  name: whitelister
+data:
+  config.yaml: |-
+    syncInterval: 10s
+    filter:
+      labelName: whitelister
+      labelValue: true
+    ipProviders:
+    - name: kubernetes
+      params:
+        FromPort: 0
+        IpProtocol: tcp
+        ToPort: 65535
+    - name: git
+      params:
+        AccessToken: ACCESS_TOKEN
+        Config: config.yaml
+        URL: http://github.com/example.git    
+    provider:
+        name: aws
+        params:
+          KeepRuleDescriptionPrefix: DO NOT REMOVE -
+          Region: <aws-region>
+          RemoveRule: true
+          RoleArn: <aws-iam-role-arn>
+---
 # Source: whitelister/templates/deployment.yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -9,9 +47,9 @@ metadata:
     app: whitelister
     group: com.stakater.platform
     provider: stakater
-    version: 0.0.10
-    chart: "whitelister-0.0.10"
-    release: "RELEASE-NAME"
+    version: v0.0.11
+    chart: "whitelister-v0.0.11"
+    release: "whitelister"
     heritage: "Tiller"
   name: whitelister
 spec:
@@ -39,7 +77,7 @@ spec:
               fieldPath: metadata.namespace
         - name: CONFIG_FILE_PATH
           value: /configs/config.yaml
-        image: "stakater/whitelister:0.0.10"
+        image: "stakater/whitelister:v0.0.11"
         imagePullPolicy: IfNotPresent
         name: whitelister
         volumeMounts:
@@ -60,9 +98,9 @@ metadata:
     app: whitelister
     group: com.stakater.platform
     provider: stakater
-    version: 0.0.10
-    chart: "whitelister-0.0.10"
-    release: "RELEASE-NAME"
+    version: v0.0.11
+    chart: "whitelister-v0.0.11"
+    release: "whitelister"
     heritage: "Tiller"
   name: whitelister
 ---
@@ -73,9 +111,9 @@ metadata:
     app: whitelister
     group: com.stakater.platform
     provider: stakater
-    version: 0.0.10
-    chart: "whitelister-0.0.10"
-    release: "RELEASE-NAME"
+    version: v0.0.11
+    chart: "whitelister-v0.0.11"
+    release: "whitelister"
     heritage: "Tiller"
   name: whitelister-role
 rules:
@@ -95,9 +133,9 @@ metadata:
     app: whitelister
     group: com.stakater.platform
     provider: stakater
-    version: 0.0.10
-    chart: "whitelister-0.0.10"
-    release: "RELEASE-NAME"
+    version: v0.0.11
+    chart: "whitelister-v0.0.11"
+    release: "whitelister"
     heritage: "Tiller"
   name: whitelister-role-binding
 roleRef:
@@ -108,41 +146,3 @@ subjects:
   - kind: ServiceAccount
     name: whitelister
     namespace: default
----
-# Source: whitelister/templates/configmap.yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  labels:
-    app: whitelister
-    group: com.stakater.platform
-    provider: stakater
-    version: 0.0.10
-    chart: "whitelister-0.0.10"
-    release: "RELEASE-NAME"
-    heritage: "Tiller"
-  name: whitelister
-data:
-  config.yaml: |-
-    syncInterval: 10s
-    filter:
-      labelName: whitelister
-      labelValue: true
-    ipProviders:
-    - name: kubernetes
-      params:
-        FromPort: 0
-        IpProtocol: tcp
-        ToPort: 65535
-    - name: git
-      params:
-        AccessToken: ACCESS_TOKEN
-        Config: config.yaml
-        URL: http://github.com/example.git    
-    provider:
-        name: aws
-        params:
-          KeepRuleDescriptionPrefix: DO NOT REMOVE -
-          Region: <aws-region>
-          RemoveRule: true
-          RoleArn: <aws-iam-role-arn>
