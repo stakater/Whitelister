@@ -1,6 +1,6 @@
 syncInterval: 10s
 filter:
-  filterType: securityGroup
+  filterType: SecurityGroup
   labelName: whitelister
   labelValue: true
 ipProviders:

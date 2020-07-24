@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/mitchellh/mapstructure"
 	"github.com/sirupsen/logrus"
+	"github.com/stakater/Whitelister/internal/pkg/config"
 
 	"github.com/stakater/Whitelister/internal/pkg/utils"
 )
@@ -38,7 +39,7 @@ func (a *Aws) Init(params map[interface{}]interface{}) error {
 }
 
 // WhiteListIps - Get List of IP addresses to whitelist
-func (a *Aws) WhiteListIpsByLoadBalancer(resourceIds []string, ipPermissions []utils.IpPermission) error {
+func (a *Aws) WhiteListIps(filterType config.FilterType, resourceIds []string, ipPermissions []utils.IpPermission) error {
 
 	// Initial credentials loaded default credential chain from SDK. Such as
 	// the environment, shared credentials (~/.aws/credentials), or EC2 Instance
@@ -52,8 +53,8 @@ func (a *Aws) WhiteListIpsByLoadBalancer(resourceIds []string, ipPermissions []u
 	// Create the credentials from AssumeRoleProvider to assume the role
 	// referenced by the "myRoleARN" ARN.
 	roleCredentials := stscreds.NewCredentials(awsSession, a.RoleArn)
+	securityGroups, err := a.fetchSecurityGroup(filterType, awsSession, roleCredentials, resourceIds)
 
-	securityGroups, err := a.getSecurityGroupsByLoadBalancer(awsSession, roleCredentials, resourceIds)
 	if err != nil {
 		logrus.Errorf("%v", err)
 		return err
@@ -78,36 +79,4 @@ func (a *Aws) WhiteListIpsByLoadBalancer(resourceIds []string, ipPermissions []u
 		}
 	}
 	return nil
-}
-
-func (a *Aws) WhiteListIpsBySecurityGroup(filterLabel []string, ipPermissions []utils.IpPermission) error {
-
-	awsSession, err := session.NewSession()
-	if err != nil {
-		logrus.Errorf("%v", err)
-		return err
-	}
-	roleCredentials := stscreds.NewCredentials(awsSession, a.RoleArn)
-
-	securityGroups, err := a.getSecurityGroupsByTagFilter(awsSession, roleCredentials, filterLabel)
-	if err != nil {
-		logrus.Errorf("%v", err)
-		return err
-	}
-
-	ec2IpPermissions := getEc2IpPermissions(ipPermissions)
-
-	ec2Client := ec2.New(awsSession, &aws.Config{
-		Credentials: roleCredentials,
-		Region:      aws.String(a.Region),
-	})
-
-	for _, securityGroup := range securityGroups {
-		err := a.updateSecurityGroup(ec2Client, securityGroup, ec2IpPermissions)
-		if err != nil {
-			logrus.Errorf("%v", err)
-		}
-	}
-	return nil
-
 }

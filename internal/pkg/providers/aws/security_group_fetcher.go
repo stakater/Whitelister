@@ -2,6 +2,7 @@ package aws
 
 import (
 	"errors"
+	"github.com/stakater/Whitelister/internal/pkg/config"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -10,6 +11,16 @@ import (
 	"github.com/aws/aws-sdk-go/service/elb"
 	"github.com/sirupsen/logrus"
 )
+
+func (a *Aws) fetchSecurityGroup(filterType config.FilterType, session *session.Session, credentials *credentials.Credentials, resourceIds []string) ([]*ec2.SecurityGroup, error) {
+	if filterType == config.LoadBalancer {
+		return a.getSecurityGroupsByLoadBalancer(session, credentials, resourceIds)
+	} else if filterType == config.SecurityGroup {
+		return a.getSecurityGroupsByTagFilter(session, credentials, resourceIds)
+	} else {
+		return nil, errors.New("unrecognized filter type " + filterType.String())
+	}
+}
 
 func (a *Aws) getSecurityGroupsByLoadBalancer(session *session.Session, credentials *credentials.Credentials, resourceIds []string) ([]*ec2.SecurityGroup, error) {
 
@@ -63,6 +74,10 @@ func (a *Aws) getSecurityGroupsByLoadBalancer(session *session.Session, credenti
 }
 
 func (a *Aws) getSecurityGroupsByTagFilter(session *session.Session, credentials *credentials.Credentials, filterLabel []string) ([]*ec2.SecurityGroup, error) {
+
+	if len(filterLabel) != 2 {
+		return nil, errors.New("not enough tag filters provided")
+	}
 
 	ec2Client := getEc2Client(session, credentials, a)
 	filters := a.getSearchFilterWithTag(filterLabel)

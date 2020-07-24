@@ -43,19 +43,19 @@ func (t *Task) PerformTasks() {
 		combinedIPPermissions = utils.CombineIpPermission(combinedIPPermissions, ipList)
 	}
 
-	if t.config.Filter.FilterType.String() == config.LoadBalancerStr {
+	if t.config.Filter.FilterType == config.LoadBalancer {
 		loadBalancerNames := t.getLoadBalancerNames(t.config.Filter)
 		logrus.Info("load balancer names: ", loadBalancerNames[0])
 
 		if len(loadBalancerNames) > 0 {
-			_ = t.provider.WhiteListIpsByLoadBalancer(loadBalancerNames, combinedIPPermissions)
+			_ = t.provider.WhiteListIps(t.config.Filter.FilterType, loadBalancerNames, combinedIPPermissions)
 		} else {
 			logrus.Errorf("Cannot find any services with label name: " + t.config.Filter.LabelName +
 				" , label value: " + t.config.Filter.LabelValue)
 		}
-	} else if t.config.Filter.FilterType.String() == config.SecurityGroupStr {
+	} else if t.config.Filter.FilterType == config.SecurityGroup {
 		filterLabel := []string{t.config.Filter.LabelName, t.config.Filter.LabelValue}
-		_ = t.provider.WhiteListIpsBySecurityGroup(filterLabel, combinedIPPermissions)
+		_ = t.provider.WhiteListIps(t.config.Filter.FilterType, filterLabel, combinedIPPermissions)
 	} else {
 		logrus.Errorf("Unrecognized filter " + t.config.Filter.LabelName)
 	}

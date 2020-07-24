@@ -46,11 +46,12 @@ func TestReadConfig(t *testing.T) {
 					},
 				},
 				Filter: Filter{
-					FilterType: loadBalancer,
+					FilterType: LoadBalancer,
 					LabelName:  "whitelister",
 					LabelValue: "true",
 				},
 			},
+			wantErr: false,
 		},
 		{
 			name: "TestingWithCorrectValuesForSecurityGroupFilter",
@@ -77,11 +78,12 @@ func TestReadConfig(t *testing.T) {
 					},
 				},
 				Filter: Filter{
-					FilterType: securityGroup,
+					FilterType: SecurityGroup,
 					LabelName:  "whitelister",
 					LabelValue: "true",
 				},
 			},
+			wantErr: false,
 		},
 		{
 			name:     "TestingWithIncorrectFilterType",
@@ -90,9 +92,10 @@ func TestReadConfig(t *testing.T) {
 			errValue: errors.New("incorrect FilterType :InCorrectType provided"),
 		},
 		{
-			name: "TestingWithEmptyFile",
-			args: args{filePath: configFilePath + "Empty.yaml"},
-			want: Config{},
+			name:    "TestingWithEmptyFile",
+			args:    args{filePath: configFilePath + "Empty.yaml"},
+			want:    Config{},
+			wantErr: false,
 		},
 		{
 			name:    "TestingWithFileNotPresent",
