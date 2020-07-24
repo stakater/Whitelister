@@ -106,7 +106,7 @@ func TestReadConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := ReadConfig(tt.args.filePath)
-			if err == nil && tt.wantErr {
+			if (err == nil && tt.wantErr) || (!tt.wantErr && err != nil) {
 				t.Errorf("ReadConfig() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}

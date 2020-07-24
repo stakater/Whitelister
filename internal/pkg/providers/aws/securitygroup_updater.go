@@ -44,8 +44,7 @@ func addSecurityRules(client *ec2.EC2, securityGroup *ec2.SecurityGroup, ipPermi
 	}
 }
 
-func (a *Aws) removeSecurityRules(client *ec2.EC2, securityGroup *ec2.SecurityGroup,
-	ipPermissions []*ec2.IpPermission) {
+func (a *Aws) removeSecurityRules(client *ec2.EC2, securityGroup *ec2.SecurityGroup, ipPermissions []*ec2.IpPermission) {
 	var removeIpPermission bool
 	var ipPermissionsToRemove []*ec2.IpPermission
 

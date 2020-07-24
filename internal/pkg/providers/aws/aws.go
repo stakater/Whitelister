@@ -9,12 +9,14 @@ import (
 	"github.com/mitchellh/mapstructure"
 	"github.com/sirupsen/logrus"
 	"github.com/stakater/Whitelister/internal/pkg/config"
+	clientset "k8s.io/client-go/kubernetes"
 
 	"github.com/stakater/Whitelister/internal/pkg/utils"
 )
 
 // Aws provider class implementing the Provider interface
 type Aws struct {
+	ClientSet                 clientset.Interface
 	RoleArn                   string
 	Region                    string
 	RemoveRule                bool
@@ -27,7 +29,8 @@ func (a *Aws) GetName() string {
 }
 
 // Init initializes the Aws Provider Configuration like Access Token and Region
-func (a *Aws) Init(params map[interface{}]interface{}) error {
+func (a *Aws) Init(params map[interface{}]interface{}, clientSet clientset.Interface) error {
+	a.ClientSet = clientSet
 	err := mapstructure.Decode(params, &a) //Converts the params to Aws struct fields
 	if err != nil {
 		return err
@@ -39,9 +42,9 @@ func (a *Aws) Init(params map[interface{}]interface{}) error {
 }
 
 // WhiteListIps - Get List of IP addresses to whitelist
-func (a *Aws) WhiteListIps(filterType config.FilterType, resourceIds []string, ipPermissions []utils.IpPermission) error {
+func (a *Aws) WhiteListIps(filter config.Filter, ipPermissions []utils.IpPermission) error {
 
-	// Initial credentials loaded default credential chain from SDK. Such as
+	// Initial credentials loaded from SDK's default credential chain. Such as
 	// the environment, shared credentials (~/.aws/credentials), or EC2 Instance
 	// Role. These credentials will be used to to make the STS Assume Role API.
 	awsSession, err := session.NewSession()
@@ -53,7 +56,7 @@ func (a *Aws) WhiteListIps(filterType config.FilterType, resourceIds []string, i
 	// Create the credentials from AssumeRoleProvider to assume the role
 	// referenced by the "myRoleARN" ARN.
 	roleCredentials := stscreds.NewCredentials(awsSession, a.RoleArn)
-	securityGroups, err := a.fetchSecurityGroup(filterType, awsSession, roleCredentials, resourceIds)
+	securityGroups, err := a.fetchSecurityGroup(awsSession, roleCredentials, filter)
 
 	if err != nil {
 		logrus.Errorf("%v", err)

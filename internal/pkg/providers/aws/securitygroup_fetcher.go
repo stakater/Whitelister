@@ -3,6 +3,7 @@ package aws
 import (
 	"errors"
 	"github.com/stakater/Whitelister/internal/pkg/config"
+	"github.com/stakater/Whitelister/internal/pkg/utils"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
@@ -12,13 +13,20 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (a *Aws) fetchSecurityGroup(filterType config.FilterType, session *session.Session, credentials *credentials.Credentials, resourceIds []string) ([]*ec2.SecurityGroup, error) {
-	if filterType == config.LoadBalancer {
-		return a.getSecurityGroupsByLoadBalancer(session, credentials, resourceIds)
-	} else if filterType == config.SecurityGroup {
-		return a.getSecurityGroupsByTagFilter(session, credentials, resourceIds)
+func (a *Aws) fetchSecurityGroup(session *session.Session, credentials *credentials.Credentials, filter config.Filter) ([]*ec2.SecurityGroup, error) {
+	if filter.FilterType == config.LoadBalancer {
+		loadBalancerNames := utils.GetLoadBalancerNames(filter, a.ClientSet)
+		logrus.Info("load balancer names: ", loadBalancerNames[0])
+
+		if len(loadBalancerNames) > 0 {
+			return a.getSecurityGroupsByLoadBalancer(session, credentials, loadBalancerNames)
+		} else {
+			return nil, errors.New("Cannot find any services with label name: " + filter.LabelName + " , label value: " + filter.LabelValue)
+		}
+	} else if filter.FilterType == config.SecurityGroup {
+		return a.getSecurityGroupsByTagFilter(session, credentials, filter.LabelName, filter.LabelValue)
 	} else {
-		return nil, errors.New("unrecognized filter type " + filterType.String())
+		return nil, errors.New("unrecognized filter type " + filter.FilterType.String())
 	}
 }
 
@@ -73,14 +81,10 @@ func (a *Aws) getSecurityGroupsByLoadBalancer(session *session.Session, credenti
 	return securityGroupResult.SecurityGroups, nil
 }
 
-func (a *Aws) getSecurityGroupsByTagFilter(session *session.Session, credentials *credentials.Credentials, filterLabel []string) ([]*ec2.SecurityGroup, error) {
-
-	if len(filterLabel) != 2 {
-		return nil, errors.New("not enough tag filters provided")
-	}
+func (a *Aws) getSecurityGroupsByTagFilter(session *session.Session, credentials *credentials.Credentials, labelName string, labelValue string) ([]*ec2.SecurityGroup, error) {
 
 	ec2Client := getEc2Client(session, credentials, a)
-	filters := a.getSearchFilterWithTag(filterLabel)
+	filters := a.getSearchFilterWithTag(labelName, labelValue)
 
 	securityGroupResult, err := ec2Client.DescribeSecurityGroups(&ec2.DescribeSecurityGroupsInput{Filters: filters})
 
@@ -99,12 +103,12 @@ func getEc2Client(session *session.Session, credentials *credentials.Credentials
 	})
 }
 
-func (a *Aws) getSearchFilterWithTag(filterLabel []string) []*ec2.Filter {
+func (a *Aws) getSearchFilterWithTag(labelName string, labelValue string) []*ec2.Filter {
 	filters := make([]*ec2.Filter, 0)
-	keyName := "tag:" + filterLabel[0]
+	keyName := "tag:" + labelName
 	filter := ec2.Filter{
 		Name:   &keyName,
-		Values: []*string{&filterLabel[1]}}
+		Values: []*string{&labelValue}}
 	filters = append(filters, &filter)
 	return filters
 }
