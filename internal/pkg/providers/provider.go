@@ -2,6 +2,7 @@ package providers
 
 import (
 	"github.com/sirupsen/logrus"
+	clientset "k8s.io/client-go/kubernetes"
 
 	"github.com/stakater/Whitelister/internal/pkg/config"
 	"github.com/stakater/Whitelister/internal/pkg/providers/aws"
@@ -10,15 +11,15 @@ import (
 
 // Provider interface so that providers like aws, google cloud can implement this
 type Provider interface {
-	Init(map[interface{}]interface{}) error
-	WhiteListIps(resourceIds []string, ipPermissions []utils.IpPermission) error
+	Init(map[interface{}]interface{}, clientset.Interface) error
+	WhiteListIps(filter config.Filter, ipPermissions []utils.IpPermission) error
 }
 
 // PopulateFromConfig populates the IpProvider from config
-func PopulateFromConfig(configProvider config.Provider) Provider {
+func PopulateFromConfig(configProvider config.Provider, clientset clientset.Interface) Provider {
 	providerToAdd := MapToProvider(configProvider.Name)
 	if providerToAdd != nil {
-		err := providerToAdd.Init(configProvider.Params)
+		err := providerToAdd.Init(configProvider.Params, clientset)
 		if err != nil {
 			logrus.Errorf("%v", err)
 		}

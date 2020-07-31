@@ -1,10 +1,7 @@
 package tasks
 
 import (
-	"context"
-
 	"github.com/sirupsen/logrus"
-	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	clientset "k8s.io/client-go/kubernetes"
 
 	"github.com/stakater/Whitelister/internal/pkg/config"
@@ -43,38 +40,5 @@ func (t *Task) PerformTasks() {
 		combinedIPPermissions = utils.CombineIpPermission(combinedIPPermissions, ipList)
 	}
 
-	loadBalancerNames := t.getLoadBalancerNames(t.config.Filter)
-
-	if len(loadBalancerNames) > 0 {
-		t.provider.WhiteListIps(loadBalancerNames, combinedIPPermissions)
-	} else {
-		logrus.Errorf("Cannot find any services with label name: " + t.config.Filter.LabelName +
-			" , label value: " + t.config.Filter.LabelValue)
-	}
-
-}
-
-// Get Load Balancer names
-func (t *Task) getLoadBalancerNames(filter config.Filter) []string {
-	services, err := t.clientset.CoreV1().Services("").List(context.TODO(), meta_v1.ListOptions{
-		LabelSelector: filter.LabelName + "=" + filter.LabelValue},
-	)
-
-	if err != nil {
-		logrus.Fatal(err)
-	}
-
-	loadBalancerNames := []string{}
-	var loadBalancerDNSName string
-
-	for _, service := range services.Items {
-		if service.Spec.Type == "LoadBalancer" {
-			loadBalancerDNSName =
-				utils.GetLoadBalancerNameFromDNSName(service.Status.LoadBalancer.Ingress[0].Hostname)
-			loadBalancerNames = append(loadBalancerNames, loadBalancerDNSName)
-		} else {
-			logrus.Error("Cannot process service : " + service.Name)
-		}
-	}
-	return loadBalancerNames
+	_ = t.provider.WhiteListIps(t.config.Filter, combinedIPPermissions)
 }

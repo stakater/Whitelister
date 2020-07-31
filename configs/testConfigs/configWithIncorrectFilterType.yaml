@@ -1,14 +1,14 @@
 syncInterval: 10s
 filter:
-  filterType: LoadBalancer
+  filterType: InCorrectType
   labelName: whitelister
   labelValue: true
 ipProviders:
-  - name: git
+  - name: kubernetes
     params:
-      AccessToken: "access-token"
-      URL: "http://github.com/stakater/whitelister-config.git"
-      Config: "config.yaml"
+      FromPort: 0 
+      ToPort: 65535
+      IpProtocol: tcp
 provider:
   name: aws
   params:

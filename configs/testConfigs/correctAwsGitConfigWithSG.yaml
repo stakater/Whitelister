@@ -1,6 +1,6 @@
 syncInterval: 10s
 filter:
-  filterType: LoadBalancer
+  filterType: SecurityGroup
   labelName: whitelister
   labelValue: true
 ipProviders:

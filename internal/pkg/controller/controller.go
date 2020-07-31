@@ -32,7 +32,7 @@ func NewController(clientset clientset.Interface, config config.Config) (*Contro
 	if len(controller.ipProviders) == 0 {
 		return nil, errors.New("No Ip Provider specified")
 	}
-	controller.provider = providers.PopulateFromConfig(config.Provider)
+	controller.provider = providers.PopulateFromConfig(config.Provider, clientset)
 	if controller.provider == nil {
 		return nil, errors.New("No Provider specified")
 	}
