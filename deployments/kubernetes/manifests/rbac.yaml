@@ -7,8 +7,8 @@ metadata:
     app: whitelister
     group: com.stakater.platform
     provider: stakater
-    version: v0.0.14
-    chart: "whitelister-v0.0.14"
+    version: v0.0.15
+    chart: "whitelister-v0.0.15"
     release: "whitelister"
     heritage: "Tiller"
   name: whitelister
@@ -20,8 +20,8 @@ metadata:
     app: whitelister
     group: com.stakater.platform
     provider: stakater
-    version: v0.0.14
-    chart: "whitelister-v0.0.14"
+    version: v0.0.15
+    chart: "whitelister-v0.0.15"
     release: "whitelister"
     heritage: "Tiller"
   name: whitelister-role
@@ -42,8 +42,8 @@ metadata:
     app: whitelister
     group: com.stakater.platform
     provider: stakater
-    version: v0.0.14
-    chart: "whitelister-v0.0.14"
+    version: v0.0.15
+    chart: "whitelister-v0.0.15"
     release: "whitelister"
     heritage: "Tiller"
   name: whitelister-role-binding
