@@ -9,8 +9,8 @@ metadata:
     app: whitelister
     group: com.stakater.platform
     provider: stakater
-    version: v0.0.13
-    chart: "whitelister-v0.0.13"
+    version: v0.0.16
+    chart: "whitelister-v0.0.16"
     release: "whitelister"
     heritage: "Tiller"
   name: whitelister
@@ -39,7 +39,7 @@ spec:
               fieldPath: metadata.namespace
         - name: CONFIG_FILE_PATH
           value: /configs/config.yaml
-        image: "stakater/whitelister:v0.0.13"
+        image: "stakater/whitelister:v0.0.16"
         imagePullPolicy: IfNotPresent
         name: whitelister
         volumeMounts:
