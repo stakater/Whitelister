@@ -76,7 +76,8 @@ File a GitHub [issue](https://github.com/stakater/Whitelister/issues), or send u
 
 Join and talk to us on Slack for discussing Whitelister
 
-[![Join Slack](https://stakater.github.io/README/stakater-join-slack-btn.png)](https://stakater-slack.herokuapp.com/)
+[![Join Slack](https://stakater.github.io/README/stakater-join-slack-btn.png)](https://slack.stakater.com/)
+[![Chat](https://stakater.github.io/README/stakater-chat-btn.png)](https://stakater-community.slack.com/messages/C018GBSABM3)
 
 ## Contributing
 
