@@ -13,7 +13,7 @@ import (
 func NewWhitelisterCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "Whitelister",
-		Short: "A tool which manages AWS security groups to allow access to nodes and developers",
+		Short: "A tool which manages AWS and Azure security groups to allow access to nodes and developers",
 		Run:   startWhitelister,
 	}
 	return cmd

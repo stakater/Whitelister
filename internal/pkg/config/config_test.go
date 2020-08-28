@@ -86,8 +86,49 @@ func TestReadConfig(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "TestingWithCorrectValuesForSecurityGroupFilterOnAzure",
+			args: args{filePath: configFilePath + "correctAzureGitConfigWithSG.yaml"},
+			want: Config{
+				SyncInterval: "10s",
+				IpProviders: []IpProvider{
+					{
+						Name: "git",
+						Params: map[interface{}]interface{}{
+							"AccessToken": "access-token",
+							"URL":         "http://github.com/stakater/whitelister-config.git",
+							"Config":      "config.yaml",
+						},
+					},
+				},
+				Provider: Provider{
+					Name: "azure",
+					Params: map[interface{}]interface{}{
+						"RemoveRule":                true,
+						"KeepRuleDescriptionPrefix": "DO NOT REMOVE -",
+						"SubscriptionID":            "47c9180a-967d-4ba0-bfc0-7b12762f0779",
+						"ClientID":                  "4ab0b7f2-197f-4b14-bf22-1856a6f095aa",
+						"ClientSecret":              "thisisthesecret",
+						"TenantID":                  "73cf1f9c-03d0-4709-8434-b50bc8440454",
+						"ResourceGroupName":         "my-resource-group",
+					},
+				},
+				Filter: Filter{
+					FilterType: SecurityGroup,
+					LabelName:  "whitelister",
+					LabelValue: "true",
+				},
+			},
+			wantErr: false,
+		},
+		{
 			name:     "TestingWithIncorrectFilterType",
 			args:     args{filePath: configFilePath + "configWithIncorrectFilterType.yaml"},
+			wantErr:  true,
+			errValue: errors.New("incorrect FilterType :InCorrectType provided"),
+		},
+		{
+			name:     "TestingWithIncorrectFilterTypeAzure",
+			args:     args{filePath: configFilePath + "configWithIncorrectFilterTypeAzure.yaml"},
 			wantErr:  true,
 			errValue: errors.New("incorrect FilterType :InCorrectType provided"),
 		},
