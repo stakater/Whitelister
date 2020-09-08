@@ -1,0 +1,23 @@
+syncInterval: 10s
+filter:
+  filterType: SecurityGroup
+  labelName: whitelister
+  labelValue: true
+ipProviders:
+  - name: git
+    params:
+      AccessToken: "access-token"
+      URL: "http://github.com/stakater/whitelister-config.git"
+      Config: "config.yaml"
+provider:
+  name: azure
+  params:
+    KeepRuleDescriptionPrefix: "DO NOT REMOVE -"
+    RemoveRule: true
+    SubscriptionID: "47c9180a-967d-4ba0-bfc0-7b12762f0779"
+    ClientID: "4ab0b7f2-197f-4b14-bf22-1856a6f095aa"
+    ClientSecret: "thisisthesecret"
+    TenantID: "73cf1f9c-03d0-4709-8434-b50bc8440454"
+    ResourceGroupName: "my-resource-group"
+
+ 

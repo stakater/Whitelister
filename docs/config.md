@@ -43,7 +43,9 @@ provider:
 
 ## Filter
 
-labelName and labelValue represent the key value pair of a tag in case of filterType "SecurityGroup". However, if filterType is "LoadBalancer" labelName and labelValue correspond to the label's key value pair on kubernetes service
+labelName and labelValue represent the key value pair of a tag in case of filterType "SecurityGroup". However, if filterType is "LoadBalancer" labelName and labelValue correspond to the label's key value pair on kubernetes service.
+
+Azure supports only "SecurityGroup" filter type.
 
 ## Ip Providers
 
@@ -57,3 +59,4 @@ Whitelister supports the following IP Providers
 Whitelister supports the following Providers
 
 1. [Amazon Web Services](providers/aws.md)
+2. [Azure](providers/azure.md)
