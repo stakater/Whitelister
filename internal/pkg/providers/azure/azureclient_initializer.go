@@ -3,9 +3,8 @@ package azure
 import (
 	"github.com/Azure/azure-sdk-for-go/profiles/2019-03-01/network/mgmt/network"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-05-01/resources"
-	"github.com/sirupsen/logrus"
-
 	"github.com/Azure/go-autorest/autorest/azure/auth"
+	"github.com/sirupsen/logrus"
 )
 
 func (a *Azure) initializeAzureClients() error {
@@ -31,41 +30,36 @@ func (a *Azure) initializeAzureClients() error {
 	}
 	a.securityRulesClient = *securityRulesClient
 
+	authorizer, err := auth.NewClientCredentialsConfig(a.ClientID, a.ClientSecret, a.TenantID).Authorizer()
+	if err != nil {
+		logrus.Error("Error creating azure authorizer using new client credentials config")
+		return err
+	}
+	a.authorizer = authorizer
+
 	return nil
 }
 
 func getResourcesClient(a *Azure) (*resources.Client, error) {
 
-	authorizer, err := auth.NewClientCredentialsConfig(a.ClientID, a.ClientSecret, a.TenantID).Authorizer()
-	if err != nil {
-		return nil, err
-	}
 	resourcesClient := resources.NewClient(a.SubscriptionID)
-	resourcesClient.Authorizer = authorizer
+	resourcesClient.Authorizer = a.authorizer
 
 	return &resourcesClient, nil
 }
 
 func getSecurityGroupsClient(a *Azure) (*network.SecurityGroupsClient, error) {
 
-	authorizer, err := auth.NewClientCredentialsConfig(a.ClientID, a.ClientSecret, a.TenantID).Authorizer()
-	if err != nil {
-		return nil, err
-	}
 	nsgClient := network.NewSecurityGroupsClient(a.SubscriptionID)
-	nsgClient.Authorizer = authorizer
+	nsgClient.Authorizer = a.authorizer
 
 	return &nsgClient, nil
 }
 
 func getSecurityRulesClient(a *Azure) (*network.SecurityRulesClient, error) {
 
-	authorizer, err := auth.NewClientCredentialsConfig(a.ClientID, a.ClientSecret, a.TenantID).Authorizer()
-	if err != nil {
-		return nil, err
-	}
 	securityRulesClient := network.NewSecurityRulesClient(a.SubscriptionID)
-	securityRulesClient.Authorizer = authorizer
+	securityRulesClient.Authorizer = a.authorizer
 
 	return &securityRulesClient, nil
 }

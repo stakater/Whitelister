@@ -3,6 +3,7 @@ package azure
 import (
 	"github.com/Azure/azure-sdk-for-go/profiles/2019-03-01/network/mgmt/network"
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2019-05-01/resources"
+	"github.com/Azure/go-autorest/autorest"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/sirupsen/logrus"
@@ -18,6 +19,7 @@ type Azure struct {
 	resourcesClient           resources.Client
 	securityGroupClient       network.SecurityGroupsClient
 	securityRulesClient       network.SecurityRulesClient
+	authorizer                autorest.Authorizer
 	SubscriptionID            string
 	ClientID                  string
 	ClientSecret              string
